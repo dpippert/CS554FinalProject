@@ -8,27 +8,26 @@ in order to help out with building this product.
 - Kyle Bernardes CWID 10412644
 - Mahima Chandan CWID 10467889
 - Dale Pippert CWID 10469880
-- Madeline Rys CWID 10416134
 
 ### GitHub URLs
 
 #### Topic Tempest project site
 
-<a href="https://github.com/madelinerys/CS554FinalProject">
-https://github.com/madelinerys/CS554FinalProject</a>
+<a href="https://github.com/dpippert/CS554FinalProject">
+https://github.com/dpippert/CS554FinalProject</a>
 
 #### Topic Tempest Technical Implementation Plan 
 
 *Significant changes have been made to the design since this plan was submitted.*
 
-<a href="https://github.com/madelinerys/CS554FinalProject/blob/master/doc/TechImplementationPlan.md">
-https://github.com/madelinerys/CS554FinalProject/blob/master/doc/TechImplementationPlan.md
+<a href="https://github.com/dpippert/CS554FinalProject/blob/master/doc/TechImplementationPlan.md">
+https://github.com/dpippert/CS554FinalProject/blob/master/doc/TechImplementationPlan.md
 </a>
 
 #### Topic Tempest Design Notes (this document) 
 
-<a href="https://github.com/madelinerys/CS554FinalProject/blob/master/doc/DesignNotes.md">
-https://github.com/madelinerys/CS554FinalProject/blob/master/doc/DesignNotes.md
+<a href="https://github.com/dpippert/CS554FinalProject/blob/master/doc/DesignNotes.md">
+https://github.com/dpippert/CS554FinalProject/blob/master/doc/DesignNotes.md
 </a>
 
 <div class="page"/>
@@ -311,9 +310,9 @@ players browsers.
 
 ### Q/A database
 
-1. Game is supported by a Question and Answer (Q/A) Mongodb database.
+1. Game is supported by a Question and Answer (Q/A) Mongo database.
 
-1. Authenticated users have capability to author/edit Q/A entries in the Mongodb database.
+1. Authenticated users have capability to author/edit Q/A entries in Mongodb.
 
 ## Work Breakdown
 
@@ -323,7 +322,7 @@ players browsers.
   <th>Item</th><th>Developer</th>
 </tr>
 
-<tr><td>Initial application framework with Authentication</td><td>Mahima</td></tr>
+<tr><td>Initial application framework with Authentication</td><td>Dale</td></tr>
 
 <tr>
   <td>Authentication. Sign up/Sign in. One third-party identity provider (eg Google/Facebook/Twitter etc.)
@@ -331,9 +330,11 @@ supported in addition to Tempest itself.</td><td>Mahima</td>
 </tr>
 
 <tr>
-  <td>Q/A database and user interface
-and editing of topics and question/answer. Questions may have more than one correct answer.</td><td>Madeline</td>
+  <td>Q/A Mongo database and user interface
+and editing of topics and question/answer. Questions may have more than one correct answer.</td><td>Mahima</td>
 </tr>
+
+<tr>Seed file of Q/A to populate Mongo database</td><td>Dale</td></tr>
 
 <tr>
   <td>React UI</td></td><td>Kyle</td>
@@ -355,12 +356,12 @@ and editing of topics and question/answer. Questions may have more than one corr
   <td>Video questions. Make videos for some questions and handle upload to
 a storage provider somewhere.</td><td>TBD</td>
 </tr>
+</tbody>
+</table>
 
 ## Project notes
 
 1. Most drawings were prepared using <a href="https://draw.io">Draw I/O</a>.
 
-</tbody>
-</table>
 
 
