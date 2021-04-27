@@ -334,7 +334,7 @@ supported in addition to Tempest itself.</td><td>Mahima</td>
 and editing of topics and question/answer. Questions may have more than one correct answer.</td><td>Mahima</td>
 </tr>
 
-<tr>Seed file of Q/A to populate Mongo database</td><td>Dale</td></tr>
+<tr><td>Seed file of Q/A to populate Mongo database</td><td>Dale</td></tr>
 
 <tr>
   <td>React UI</td></td><td>Kyle</td>
