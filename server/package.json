@@ -6,7 +6,7 @@
     "mongodb": "3.6.2",
     "uuid": "8.3.2"
   },
-  "name": "Topic Tempest",
+  "name": "TopicTempest",
   "version": "1.0.0",
   "description": "Topic Tempest",
   "main": "index.js",

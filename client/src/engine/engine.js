@@ -1,7 +1,9 @@
 /* eslint-disable */
 
-const firebase = require('firebase/app');
-require('firebase/database');
+//const firebase = require('firebase/app');
+//require('firebase/database');
+
+const firebase = require('firebase');
 
 // const admin = require('firebase-admin'); need service account I think
 // wanting to use admin to delete users
@@ -16,9 +18,10 @@ let app_;
 const w = console.warn;
 
 async function init() {
-  w("inside init");
   if (app_)
     return app_;
+  w("firebase.apps next");
+  w(firebase.apps);
   var firebaseConfig = {
     apiKey: "AIzaSyDXY_JGPJQggvKNFcuMzgZRbOzlxz5nTV4",
     authDomain: "goodp5.firebaseapp.com",
@@ -29,6 +32,10 @@ async function init() {
     appId: "1:380175280675:web:59b4df03723f2a64315f96"
   };
   app_ = firebase.initializeApp(firebaseConfig);
+  w("app next");
+  w(app_);
+  w("firebase.apps next");
+  w(firebase.apps);
   const auth = app_.auth();
   const db = firebase.database(app_);
 
@@ -36,7 +43,7 @@ async function init() {
   return app_;
 }
 
-const CHAR_DELAY = 50;
+const CHAR_DELAY = 80;
 const NUM_PLAYERS = 2; // 1 is broken
 const QUESTION_TIME_SEC = 16;
 
@@ -255,7 +262,7 @@ async function doRoundConsole() {
 // ----------------------------------------------------------------------------
 // Expects a callback function where all events will be reported.
 // If no callback function is passed in, engine uses an internal default
-// callback function and assume it is running standalone on a terminal with
+// callback function and assumes it is running standalone on a terminal with
 // with no browser driving it.
 // ----------------------------------------------------------------------------
 
@@ -276,13 +283,12 @@ async function start(cb) {
       await display("Great! Let's get started..");
       await readyToPlay();
     }
-    return {
-      ready_to_play_fn: readyToPlay,
-      pick_fn: question,
-      buzzin_fn: buzzin
-    }
+    return {ready_to_play_fn: readyToPlay,
+            pick_fn: question,
+            buzzin_fn: buzzin};
   }
   catch (e) {
+    w(e);
     display(e);
   }
 }
@@ -400,18 +406,37 @@ async function writechar(c) {
   });
 }
 
+async function writechar_browser(c) {
+  return new Promise(resolve => {
+    let x = document.getElementById("guidance");
+    if (x.value.length)
+      x.value = x.value + c;
+    else
+      x.value = c;
+    setTimeout(() => {
+      resolve();
+    }, CHAR_DELAY);
+  });
+}
+
 async function writeline(str) {
   if (str == null)
     return;
   for (var i = 0; i < str.length; ++i)
-    await writechar(str.charAt(i));
+    if (cb_)
+      await writechar_browser(str.charAt(i));
+    else
+      await writechar(str.charAt(i));
   if (str.length)
-    await writechar('\n');
+    if (cb_)
+      await writechar_browser('\n');
+    else
+      await writechar('\n');
 }
 
 // ----------------------------------------------------------------------------
 // Writes the string str to the console with a delay between each character
-// so that it more closely mimics the speed of speech.
+// so that it more closely aligns with the cadence of speech.
 // ----------------------------------------------------------------------------
 
 async function display(str) {
@@ -637,7 +662,7 @@ async function revealTopics() {
   for (let i = 0; i < topics.length; ++i) {
     if (cb_)
       cb_('topic', [i, topics[i]]);
-    await dmsg(1, `Topic is ${topics[i]}`);
+    await dmsg(1, `Topic is ${topics[i]}.`);
   }
   if (cb_)
     cb_('topic_reveal_ends', topics.length);
