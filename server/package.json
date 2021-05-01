@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "apollo-server": "2.22.2",
+    "graphql": "15.5.0",
+    "lodash": "4.17.1",
+    "mongodb": "3.6.2",
+    "uuid": "8.3.2"
+  },
+  "name": "Topic Tempest",
+  "version": "1.0.0",
+  "description": "Topic Tempest",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dale Pippert",
+  "license": "ISC"
+}

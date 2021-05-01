@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# -----------------------------------------------------------------------------
+# Pass in the graphql file you want to run against your apollo server in
+# graphql syntax. Works for query and mutation. Note that in both of the
+# query and mutation cases, the keyword in the JSON object that is submitted
+# is still 'query' below.
+# -----------------------------------------------------------------------------
+
+tr -d '\012\015' < $1 > ~/tmp/tmpqry 
+sed -i 's/"/\\"/g' ~/tmp/tmpqry 
+echo -n '{"query":"' > ~/tmp/tmpa
+cat ~/tmp/tmpa ~/tmp/tmpqry > ~/tmp/tmpb
+echo -n '"}' >> ~/tmp/tmpb
+cp ~/tmp/tmpb tmp.query
+
+curl 'http://localhost:4000/' \
+  -H 'Content-Type: application/json' \
+  -H 'Accept-Encoding: gzip, deflate, br' \
+  -H 'Accept: application/json' \
+  -H 'Connection: keep-alive' \
+  -H 'DNT: 1' \
+  -H 'Origin: http://localhost:4000' \
+  --data-binary @tmp.query \
+  --compressed
+
+rm -f tmp.query

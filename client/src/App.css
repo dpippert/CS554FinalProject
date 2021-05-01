@@ -1,0 +1,42 @@
+.App-header {
+	height: 300px;
+	padding: 20px;
+	color: #222;
+	position: relative;
+}
+
+.topictempest {
+  height: 200px;
+  background: url('./topictempest.png') no-repeat;
+}
+
+nav {
+	list-style: none;
+	font-weight: bold;
+	position: absolute;
+	bottom: 20px;
+}
+
+.navlink {
+	padding: 0.4rem 0.8rem;
+	border-radius: 3px;
+  color: white;
+	margin-right: 20px;
+}
+
+.navlink:hover {
+	background-color: white;
+	color: #28547a;
+	text-decoration: none !important;
+}
+
+textarea {
+  background-color: white;
+  color: green;
+  font-size: .8em;
+  font-family: 'Courier New';
+  font-weight: bold;
+  margin-left: 20px;
+/*  padding: 20px; */
+}
+

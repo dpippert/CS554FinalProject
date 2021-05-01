@@ -1,0 +1,7 @@
+mutation {
+  addQuestion(t: "CSS",
+              q: "The C in CSS stands for this word.",
+              a: ["cascading"]) {
+    t q a
+  }
+}

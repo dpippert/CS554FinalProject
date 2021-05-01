@@ -312,6 +312,14 @@ players browsers.
 
 1. Game is supported by a Question and Answer (Q/A) Mongo database.
 
+1. Mongo will have a collection called *questions* with schema as
+
+```
+{t: "the topc",
+ q: "the question",
+ a: ["answer1", "answer2", "answer3"]}
+```
+
 1. Authenticated users have capability to author/edit Q/A entries in Mongodb.
 
 ## Work Breakdown
@@ -322,7 +330,7 @@ players browsers.
   <th>Item</th><th>Developer</th>
 </tr>
 
-<tr><td>Initial application framework with Authentication</td><td>Dale</td></tr>
+<tr><td>Initial application framework without Authentication</td><td>Dale</td></tr>
 
 <tr>
   <td>Authentication. Sign up/Sign in. One third-party identity provider (eg Google/Facebook/Twitter etc.)
@@ -361,7 +369,7 @@ a storage provider somewhere.</td><td>TBD</td>
 
 ## Project notes
 
-1. Most drawings were prepared using <a href="https://draw.io">Draw I/O</a>.
+1. Drawings were prepared using <a href="https://app.diagrams.net">Draw I/O</a>.
 
 
 

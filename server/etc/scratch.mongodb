@@ -1,0 +1,297 @@
+db.questions.count()
+
+show collections
+
+show dbs
+
+use tempest
+
+use template
+
+db.dropDatabase()
+
+db.questions.find({t: "CSS"})
+
+db
+
+-----
+db.bets.count()
+
+db.bets.deleteMany({})
+
+db.bets.find()
+
+db.bets.updateMany({}, { $set: { resolved: null, paid: null } })
+
+db.bets.insertOne(
+{
+  gameid: 'pit-buf-2020-12-13',
+  aspNum: null,
+  aspBet: null,
+  aspWin: null,
+  aspCollect: null,
+  amlNum: 110,
+  amlBet: 60,
+  amlWin: 54,
+  amlCollect: 114,
+  hspNum: -2,
+  hspBet: 23,
+  hspWin: 20,
+  hspCollect: 43,
+  hmlNum: -130,
+  hmlBet: 20,
+  hmlWin: 18,
+  hmlCollect: 38,
+  overNum: 48,
+  overBet: 17,
+  overWin: 15,
+  overCollect: 32,
+  underNum: null,
+  underBet: null,
+  underWin: null,
+  underCollect: null
+})
+
+db.users.find({username: 'dale'}).pretty()
+
+db.users.find({username: 'D87pippert'}).pretty()
+
+db.users.find({})
+
+db.users.deleteOne({username: 'Foghorn5'});
+
+db.users.updateOne({_id: "aeeb758c75ee6029745ca8a0"}, { $set: { balance: 1000 }})
+
+db.users.updateOne({_id: ObjectId("5fdb42242a3bb72ba852ed3a")}, { $set: { balance: 10000 }})
+
+db.users.find({username: 'D87pippert'}).pretty()
+
+-----
+
+show collections
+
+db.goo.drop()
+
+show dbs
+
+db
+
+use jerry
+
+db.foo.deleteMany({})
+
+db.foo.find()
+
+db.foo.insert({bing: "bat", scores: [8]})
+
+db.foo.insert({bing: "abc", scores: [ ]})
+
+db.foo.aggregate(
+  { $match: { $expr: { $eq: [ { $size: "$scores" }, 0 ] } } }
+)
+
+db.foo.insertMany([{ "_id" : ObjectId("5fd928c94b679e5ee09b8634"), "bettorid" : "aeeb758c75ee6029745ca8a0", "gameid" : "bal-cle-2020-12-14", "paid" : null, "resolved" : null, "entered" : ISODate("2020-12-15T21:21:13.277Z"), "bettype" : "ASP", "num" : -3, "amount" : 46, "pays" : 41,
+"collects" : 87 }]);
+
+db.foo.find()
+
+db.foo.aggregate({$addFields: {foo: "bar"}})
+
+db.lines.count()
+
+db.lines.insert({});
+
+db.lines.find().pretty()
+
+db.lines.find({lineDateStr: "2020-11-27"});
+
+db.lines.deleteMany({})
+
+db.orders.insert({orderid: 1, company: 'amazon'})
+
+db.items.insert({itemid: 2, orderno: 1, name: 'soap'})
+db.items.insert({itemid: 3, orderno: 1, name: 'brush'})
+db.items.insert({itemid: 3, orderno: 1, name: 'toaster'})
+
+db.items.find()
+
+db.orders.aggregate([
+
+db.orders.aggregate([
+    { $lookup: {
+         from: "items",
+         localField: "orderid",
+         foreignField: "orderno",
+         as: "orderedItems"
+      }
+    },
+    { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$orderedItems", 3 ] }, "$$ROOT" ] } }
+    },
+    {
+      $unset: ["orderedItems"]
+    }]).pretty()
+
+db.bets.aggregate([
+    {
+      $lookup: {
+         from: "scores",
+         localField: "gameid",
+         foreignField: "_id",
+         as: "score"
+      }
+    },
+    {
+      $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$score", 0 ] }, "$$ROOT" ] } }
+    },
+    { $unset: "score" }]).pretty()
+
+db.bets.aggregate([
+  { $addFields: {
+     "paid" : {
+       $switch: {
+         branches: [
+           { case: { $gt: [ "$outcome", 0 ] },
+             then: { $sum: [ "$amount", "$pays" ] } },
+           { case: { $lt: [ "$outcome", 0 ] },
+             then: 0 } ],
+         default: "$amount"}}}}])
+
+db.bets.count()
+
+db.bets.deleteMany({})
+
+db.bets.find().pretty()
+
+db.bets.insert(
+{
+  _id: "7eeb5b6186fbfca1f18ed313",
+  bettorid: "aeeb758c75ee6029745ca8a0",
+  gameid: "hou-kc-2020-09-10",
+  bettype: 'ASP',
+  num: 15,
+  amount: 66,
+  pays: 60,
+  collects: 126,
+  paid: null,
+  entered: "2020-09-08",
+  resolved: null
+})
+
+db.bets.update({}, { $set: { "homeScore": 16 } })
+
+db.bets.update({}, { $set: { "paid": null } })
+
+db.bets.update({}, { $set: { "bettype": "UN" } })
+
+db.bets.update({}, { $set: { "num": 48 } })
+
+db.bets.update({}, { $set: { "outcome": 0 } })
+
+db.settings.find()
+
+db.settings.updateOne({}, { $set: { "simdate": "2020-11-27" }})
+
+db.settings.updateOne({}, { $set: { "simdate": null }})
+
+db.users.find().pretty()
+
+db.users.find()
+
+db.users.insertOne({_id: "5ee77f8c75ee6029745ca8ac", username: "dale", pwd: "dale", balance: 200})
+
+db.users.updateOne({_id: "aeeb758c75ee6029745ca8a0"}, { $set: { balance: 1000 }})
+
+db.users.updateOne({_id: "aeeb758c75ee6029745ca8a0"}, { $set: { balance: {"$balance" + 10" }})
+
+db.users.aggregate([
+  { $match: { _id: "aeeb758c75ee6029745ca8a0" } }]);
+
+db.users.aggregate([
+  { $match: { _id: "aeeb758c75ee6029745ca8a0" } },
+  { $set: { "balance": { $sum: [ "$balance", 10 ] }}}])
+
+db.bets.aggregate([
+  { $match: { paid: null } }])
+
+db.scores.insertOne({_id: "hou-kc-2020-09-10", awayScore: 25, homeScore: 29, gameDate: "2020-09-10"})
+
+db.scores.find({_id: "ari-sea-2020-11-19"}).pretty()
+
+db.scores.find()
+
+db.scores.count()
+
+db.scores.find({_id: "hou-ind-2020-12-20"});
+
+db.scores.find({_id: "gb-min-2020-09-13"});
+
+db.scores.deleteMany({})
+
+db.scores.update({_id: "hou-kc-2020-09-10"}, { $set: { "awayScore" : 40 } })
+
+db.scores.aggregate({$addFields: {foo: "bar"}})
+
+db.bets.aggregate([
+    { $addFields: {
+       "outcome": {
+          $switch: {
+            branches: [
+              { case: { $eq: [ "$bettype", "ASP" ] },
+                then: { $subtract: [ { $sum: [ "$awayScore", "$num" ] }, "$homeScore" ] } },
+              { case: { $eq: [ "$bettype", "HSP" ] },
+                then: { $subtract: [ { $sum: [ "$homeScore", "$num" ] }, "$awayScore" ] } },
+              { case: { $eq: [ "$bettype", "AML" ] },
+                then: { $subtract: [ "$awayScore", "$homeScore" ] } },
+              { case: { $eq: [ "$bettype", "HML" ] },
+                then: { $subtract: [ "$homeScore", "$awayScore" ] } },
+              { case: { $eq: [ "$bettype", "OV" ] },
+                then: { $subtract: [ { $sum: [ "$homeScore", "$awayScore" ] }, "$num" ] } },
+              { case: { $eq: [ "$bettype", "UN" ] },
+                then: { $subtract: [ "$num", { $sum: [ "$homeScore", "$awayScore" ] } ] } } ],
+            default: 0}}}}])
+
+{
+        "_id" : "6eeb5b6186fbfca1f18ed313",
+        "gameDate" : "2020-09-10",
+        "week" : 1,
+        "awayTeam" : "hou",
+        "awayScore" : 20,
+        "homeTeam" : "kc",
+        "homeScore" : 34,
+        "bettorid" : "5ee77f8c75ee6029745ca8ac",
+        "gameid" : "hou-kc-2020-09-10",
+        "bettype" : "ASP",
+        "num" : 3,
+        "amount" : 66,
+        "pays" : 60,
+        "collects" : 126,
+        "paid" : null,
+        "entered" : "2020-09-08",
+        "resolved" : null
+}
+
+
+    {
+      $unset: ["score"
+ ])
+
+    { $project: { fromItems: 0 } }
+
+--  "gameDate": "2020-09-10", , "awayTeam" : "hou", "awayScore" : 20, "homeTeam" : "kc", "homeScore" : 34 }
+
+-- what I want to do. For each bet in bets collection,
+-- join with the score in scores collection on gameid, and add
+-- fields from that found record in scores to the current bets
+-- record as the first step in the pipeline
+
+db.bets.find()
+
+db.bets.update({}, { $set: { "bettype": "OV" } })
+db.bets.update({}, { $set: { "paid": null } })
+
+db.users.find()
+
+
+show collections
+
+

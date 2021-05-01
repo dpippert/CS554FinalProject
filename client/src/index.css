@@ -1,0 +1,10 @@
+body {
+  background-image: url('./background.jpg');
+  background-repeat: no-repeat;
+  margin: 0;
+  font-family: Helvetica, sans-serif; 
+}
+
+code {
+  font-family: 'Courier New', monospace;
+}
