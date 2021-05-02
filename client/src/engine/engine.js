@@ -4,6 +4,7 @@
 //require('firebase/database');
 
 const firebase = require('firebase');
+const config = require('../config');
 
 // const admin = require('firebase-admin'); need service account I think
 // wanting to use admin to delete users
@@ -13,53 +14,73 @@ let prompt;
 
 let queue_ = [];
 let queue_working_ = false;
-let app_;
+let synth_;
+let zira_;
+let voices_;
 
-const w = console.warn;
+const w = console.debug;
 
-async function init() {
-  if (app_)
-    return app_;
-  w("firebase.apps next");
-  w(firebase.apps);
-  var firebaseConfig = {
-    apiKey: "AIzaSyDXY_JGPJQggvKNFcuMzgZRbOzlxz5nTV4",
-    authDomain: "goodp5.firebaseapp.com",
-    databaseURL: "https://goodp5-default-rtdb.firebaseio.com",
-    projectId: "goodp5",
-    storageBucket: "goodp5.appspot.com",
-    messagingSenderId: "380175280675",
-    appId: "1:380175280675:web:59b4df03723f2a64315f96"
-  };
-  app_ = firebase.initializeApp(firebaseConfig);
-  w("app next");
-  w(app_);
-  w("firebase.apps next");
-  w(firebase.apps);
-  const auth = app_.auth();
-  const db = firebase.database(app_);
+const APP_NAME = "tempest";
 
-  processQueue();
-  return app_;
+function isBrowser() {
+  return typeof window !== 'undefined';
 }
 
+function app() {
+  let x = firebase.apps.filter(a => a.name === APP_NAME);
+  if (!x.length) {
+    let app = firebase.initializeApp(config.firebase, APP_NAME);
+    auth = app.auth();
+    return app;
+  }
+  return firebase.app(APP_NAME);
+}
+
+function db() {
+  return firebase.database(app());
+}
+
+function init() {
+  // REVISIT this will cause compile error under nodejs, will need to
+  // move to a separate file and try requiring it, or eval a string.
+  // won't work in the face of body element changes, maybe body is stable though
+
+  /*
+  if (isBrowser()) {
+    const x = document.getElementsByTagName('body')[0];
+    w("adding event listener for sign out");
+    x.addEventListener('onunload', _ => {
+      alert("will sign out");
+      w("will sign out");
+      signOut();
+    });
+  }
+  */
+
+  processQueue();
+}
+
+const TTS_ENABLED = false;
 const CHAR_DELAY = 80;
-const NUM_PLAYERS = 2; // 1 is broken
+const NUM_PLAYERS = 2; // 1 is broken DPTEST needs fixed
 const QUESTION_TIME_SEC = 16;
 
 let players_ = {};
 let cb_, gameid_, state_, question_timer_, whosturn_;
 
-// DPTEST causing trouble in browser somehow with duplicate apps getting created
-// taking out for now
-//init().then(app => {});
-
 function makePlayer() {
   return {bal: 0}
 }
 
+// ----------------------------------------------------------------------------
+// Returns an element (key value) for path in the given gameid_. If path is
+// not passed in, the game ref itself (root of the game) is returned.
+// ----------------------------------------------------------------------------
+
 function gameref(path) {
-  return firebase.database().ref(`/games/${gameid_}/${path}`);
+  return path == undefined ?
+    db().ref(`/games/${gameid_}`) :
+    db().ref(`/games/${gameid_}/${path}`);
 }
 
 // ----------------------------------------------------------------------------
@@ -116,7 +137,7 @@ let firstJudge_ = true;
 async function judgeAnswers() {
   let ref = gameref('answerlist');
   const snap = await ref.once('value')
-  const entries = snap.val();
+  const entries = snap.val() || [];
 
   ref = gameref('active_square');
   const active = (await ref.once('value')).val();
@@ -225,8 +246,9 @@ async function onWhosTurn() {
   });
 }
 
+// DPTEST
+
 async function doRoundGUI() {
-/* DPTEST commented out until I figure out why topic and amt are undefined
   try {
     await dmsg(2, `Go ahead, your turn ${name_}`);
     await msg(`${name_} chooses ${topic} for ${amt}`); // NO these are undefined $topic $amt DPTEST
@@ -237,7 +259,6 @@ async function doRoundGUI() {
     await display(e);
     await doRoundGUI();
   }
-*/
 }
 
 // ----------------------------------------------------------------------------
@@ -267,10 +288,10 @@ async function doRoundConsole() {
 // ----------------------------------------------------------------------------
 
 async function start(cb) {
+  synth_ = window.speechSynthesis;
   try {
     cb_ = cb;
-    if (!app_)
-      await init();
+    await init();
     if (!cb) {
       prompt.start();
       prompt.message = null;
@@ -285,11 +306,11 @@ async function start(cb) {
     }
     return {ready_to_play_fn: readyToPlay,
             pick_fn: question,
+            i_quit_fn: signOut,
             buzzin_fn: buzzin};
   }
   catch (e) {
     w(e);
-    display(e);
   }
 }
 
@@ -382,11 +403,20 @@ function onQuestions() {
   });
 }
 
+// ----------------------------------------------------------------------------
+// Returns a promise that never resolves. This is a poller of an output queue
+// of messages for display and speaking. Stays in here for the life of the
+// application.
+// ----------------------------------------------------------------------------
+
 function processQueue() {
-  function f() {
+  async function f() {
     if (queue_.length) {
       queue_working_ = true;
-      writeline(queue_.shift()).then(f);
+      const str = queue_.shift();
+      if (str != null && str.length)
+        await tts(str);
+      await writeline(str).then(f);
       return;
     }
     else {
@@ -443,6 +473,64 @@ async function display(str) {
   queue_working_ = true;
   queue_.push(str);
 }
+
+function tts(str) {
+  function f(resolve) {
+    if (!TTS_ENABLED) {
+      if (resolve)
+        resolve();
+      else
+        return null;
+    }
+    if (!TTS_ENABLED)
+      return null;
+    w("aaa 1");
+    if (!synth_)
+      throw 'speech synthesis is not initialized';
+    if (!zira_) {
+      zira_ = synth_.getVoices().filter(x => x.name.includes('Zira'))[0];
+      if (!zira_)
+        throw 'Could not load voice for speaker';
+    }
+    if (synth_.speaking) {
+      w("speaking, will wait until finished");
+      setTimeout(f, 1000);
+    }
+    else {
+      let utterance = new SpeechSynthesisUtterance(str);
+      utterance.pitch = 1;
+          utterance.rate = 0.8;
+      utterance.voice = zira_;
+      synth_.speak(utterance);
+      if (resolve)
+        resolve();
+    }
+  }
+  return new Promise((resolve) => { f(resolve); });
+}
+      
+/*
+async function tts(str) {
+  if (!zira_) {
+    zira_ = synth_.getVoices().filter(x => x.name.includes('Zira'))[0];
+    console.debug("zira next..");
+    console.debug(zira_);
+  }
+  if (synth_.speaking) {
+    console.error("synth_ is already speaking");
+    return;
+  }
+  let utterance = new SpeechSynthesisUtterance(str);
+  utterance.pitch = 1;
+  utterance.rate = 0.8;
+  utterance.voice = zira_;
+  console.debug("before speak..");
+  console.debug(new Date());
+  synth_.speak(utterance);
+  console.debug("after speak..");
+  console.debug(new Date());
+}
+*/
 
 // ----------------------------------------------------------------------------
 // Installs the listener for msg updates.
@@ -525,9 +613,8 @@ async function askTopicAndAmt() {
 }
 
 async function test() {
-  const ref = firebase.database().ref().child('/players/abc');
+  const ref = db().ref().child('/players/abc');
   const snap = await ref.once('value');
-  console.warn(snap.val());
 }
 
 // ----------------------------------------------------------------------------
@@ -592,10 +679,27 @@ let questions_ = {
            open: true,
            w: 1000}]};
 
+// ----------------------------------------------------------------------------
+// Specific to sub-paths under the current game. Use valueof for paths that
+// are not under the current game, such as /enrolling.
+// ----------------------------------------------------------------------------
+
 async function value(path) {
   const ref = gameref(path);
   const ds = await ref.once('value');
   return ds.val();
+}
+
+// ----------------------------------------------------------------------------
+// Specific to full paths, not limited to just game ref lookups. Use this
+// function to look up values for anything not specific to a game, such
+// as /enrolling.
+// ----------------------------------------------------------------------------
+
+async function valueof(path) {
+  let a = db().ref(path);
+  let snap = await a.once('value');
+  return snap.val();
 }
 
 // ----------------------------------------------------------------------------
@@ -612,7 +716,7 @@ async function closeQuestion(topic, amt) {
 // Not exppsed, this is a private function to the engine.
 // ----------------------------------------------------------------------------
 
-// DPTEST need to do validation on these args and throw something meaningul on each
+// DPTEST need to do validation on these args and throw something meaningful on each
 // of topic wrong and amt wrong
 
 function fullquestion(topic, amt) {
@@ -684,7 +788,7 @@ async function setWhosTurn(name) {
 let name_ = null;
 
 async function exists(path) {
-  const ref = await firebase.database().ref().child(path);
+  const ref = await db().ref().child(path);
   const snap = await ref.once('value');
   return !!snap.val();
 }
@@ -709,8 +813,8 @@ async function exists(path) {
 
 async function readyToPlay(optName) {
   name_ = optName || await ask("Enter your play name (one word only please, no spaces)");
-  const user = await firebase.auth().signInAnonymously();
-  let ref = firebase.database().ref('/enrolling');
+  const user = await firebase.auth(app()).signInAnonymously();
+  let ref = db().ref('/enrolling');
   let enrollees; 
   let enrolled_count = 0;
   let result = await ref.transaction(enrolling => {
@@ -746,7 +850,7 @@ async function readyToPlay(optName) {
   });
   if (!result.committed) {
     await display(`Name ${name_} already in use, please try another name`);
-    return await readyToPlay();
+    return await readyToPlay(optName);
   }
   if (!enrollees) {
     await msg("Welcome " + name_ + "!");
@@ -771,7 +875,7 @@ async function readyToPlay(optName) {
     rsf[ni] = {balance: 0}
     return rsf;
   }, {});
-  await firebase.database().ref('/games').child(gameid_).onDisconnect().set(null);
+  await db().ref('/games').child(gameid_).onDisconnect().set(null);
   await gameref('players').set(x);
   await setQuestions(await loadQuestions());
   await msg("We now have a quorum of players!");
@@ -798,48 +902,24 @@ async function startQuestionTimer() {
   await gameref('question_timer').set(QUESTION_TIME_SEC);
 }
 
+async function isEnrolling() {
+  let enrs = await valueof('/enrolling');
+  return enrs && enrs.includes(`gameid-${gameid_}`);
+}
+
+// ----------------------------------------------------------------------------
+// Erases the game from firebase. If the game is in the enrolling state, then
+// the /enrolling is also deleted.
+// ----------------------------------------------------------------------------
+
 async function signOut() {
-  await app_.auth().signOut();
-}
-
-/*
-async function handler(name, value) {
-  switch (name) {
-    case 'question_timer':
-      break;
-    default:
-      //console.warn(`event: ${name} with value: ${JSON.stringify(value)}`);
-      break;
+  if (isEnrolling()) {
+    let ref = db().ref('/enrolling');
+    ref.set(null);
   }
+  gameref().set(null);
+  await app().auth().signOut();
 }
-
-const engine = require('./engine');
-
-process.on('SIGINT', () => {
-  engine.signOut();
-  process.exit(0);
-});
-
-async function main() {
-  await engine.start();
-//  await engine.signOut(); doesn't seem to help anything so just stay signed in
-  //  so there are no surprises
-}
-
-main().then().catch(e => console.error(e));
-
-//engine.test().then().catch(e => console.error(e));
-
-*/
-
-// nexttime when picking up where you last left off, there can be
-// 2 players already in the rtdb, which means both engines
-// will try to start the game above in case 2. What to do
-// about that? perhaps I need to have a started state for the
-// game in fb, I set to enrolling in my init method. Race condition
-// is possibility though. When I call set against fb can it return
-// the old value so I can know if I am the one who set the new
-// state to "started" or not?
 
 module.exports = {
   buzzin,
