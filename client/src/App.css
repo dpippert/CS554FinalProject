@@ -39,3 +39,13 @@ textarea {
   margin-left: 20px;
 }
 
+button {
+  margin-top: 0px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.test-1 {
+  margin-bottom: 10px;
+}
+

@@ -26,6 +26,11 @@ function isBrowser() {
   return typeof window !== 'undefined';
 }
 
+async function tell(evName, evObj) {
+  if (cb_)
+    await cb_(evName, evObj);
+}
+
 function app() {
   let x = firebase.apps.filter(a => a.name === APP_NAME);
   if (!x.length) {
@@ -39,6 +44,8 @@ function app() {
 function db() {
   return firebase.database(app());
 }
+
+let initCount_ = 0;
 
 function init() {
   // REVISIT this will cause compile error under nodejs, will need to
@@ -57,11 +64,14 @@ function init() {
   }
   */
 
-  processQueue();
+  if (++initCount_ >= 2)
+    console.error(`Too many inits of ${initCount_}`);
+  else
+    processQueue();
 }
 
 const TTS_ENABLED = false;
-const CHAR_DELAY = 80;
+const CHAR_DELAY = 20;
 const NUM_PLAYERS = 2; // 1 is broken DPTEST needs fixed
 const QUESTION_TIME_SEC = 16;
 
@@ -106,26 +116,24 @@ function gameref(path) {
 async function onQuestionTimer() {
   const ref = gameref('question_timer');
   ref.off();
-  ref.on('value', data => {
+  ref.on('value', async data => {
     const val = data.val();
     if (val === 0) {
-      if (cb_)
-        cb_('question_time_out', null);
+      console.error('val === 0');
+      await tell('question_time_out', null);
       if (whosturn_ == name_)
-        judgeAnswers();
+        await judgeAnswers();
       return;
     }
     if (!val)
       return;
-    if (cb_)
-      cb_('question_timer', val);
-    if (name_ == 'abc' && val == 14) buzzin('badbody');
+    await tell('question_timer', val);
+    w(whosturn_);
+    w(name_);
     if (whosturn_ == name_) {
       if (val == 10)
-        msg("You have 10 seconds left to buzzin your answer.");
+        msg("You have 10 seconds left to buzz in your answer.");
       question_timer_ = setTimeout(_ => {
-        // DPTEST for debug
-        if (val == 12 && name_ == 'def') buzzin('body');
         if (val >= 0) ref.set(val - 1);
       }, 1000);
     }
@@ -139,10 +147,8 @@ async function judgeAnswers() {
   const snap = await ref.once('value')
   const entries = snap.val() || [];
 
-  ref = gameref('active_square');
-  const active = (await ref.once('value')).val();
-  const [topic, amt] = (await ref.once('value')).val();
-  const fullquestion = questions_[topic][amt / 200 - 1];
+  const {t, a, q} = await value('active_square');
+  const fullquestion = questions_[t][a / 200 - 1];
   const win = fullquestion.w;
   let doneent = false;
   let doneans = false;
@@ -150,8 +156,7 @@ async function judgeAnswers() {
   switch (entries.length) {
   case 0:
     await msg("No players have buzzed in.");
-    await msg(`Sorry, correct answer was ${fullquestion.a[0].q}`);
-    await setWhosTurn(whosturn_);
+    await msg(`Sorry, correct answer was ${fullquestion.a[0]}`);
     break;
   case 1:
     await msg(`Only player to buzz in, is ${entries[0].name}`);
@@ -231,23 +236,22 @@ function leadPlayer() {
 async function onWhosTurn() {
   const ref = gameref('whosturn');
   ref.off();
-  ref.on('value', data => {
+  ref.on('value', async data => {
     whosturn_ = data.val();
     if (!whosturn_)
       return;
-    if (cb_)
-      cb_('whosturn', whosturn_);
+    await tell('whosturn', whosturn_)
     if (name_ != whosturn_)
       return;
-    if (cb_)
-      doRoundGUI();
+    if (cb_) {
+      await dmsg(2, `Go ahead, your turn ${name_}`);
+    }
     else
       doRoundConsole();
   });
 }
 
-// DPTEST
-
+/* no longer used
 async function doRoundGUI() {
   try {
     await dmsg(2, `Go ahead, your turn ${name_}`);
@@ -260,6 +264,7 @@ async function doRoundGUI() {
     await doRoundGUI();
   }
 }
+*/
 
 // ----------------------------------------------------------------------------
 // DOes not send out the chooses msg until question has returned, meaning it
@@ -272,7 +277,7 @@ async function doRoundConsole() {
     const [topic, amt] = await askTopicAndAmt("Pick topic and amt separated by one space (eg Birds 400)");
     const q = await question(topic, amt);
     await msg(`${name_} chooses ${topic} for ${amt}`);
-    await startQuestionTimer();
+//    await startQuestionTimer();
   }
   catch (e) {
     await display(e);
@@ -288,7 +293,8 @@ async function doRoundConsole() {
 // ----------------------------------------------------------------------------
 
 async function start(cb) {
-  synth_ = window.speechSynthesis;
+  if (!synth_)
+    synth_ = window.speechSynthesis;
   try {
     cb_ = cb;
     await init();
@@ -381,10 +387,33 @@ async function setQuestions(questions) {
 
 function onPlayers() {
   const ref = gameref('players');
-  ref.on('value', data => {
+  ref.on('value', async data => {
     players_ = data.val() || {};
-    if (cb_)
-      cb_('players', players_);
+    await tell('players', players_);
+  });
+}
+
+// ----------------------------------------------------------------------------
+// Installs the listener for active_square updates. UI will display some type
+// of pop up box off this event. Event data includes the topic, amount, and
+// question, but not the answer.
+//
+// Changed to not pass up an empty value to UI since this confuses UI into
+// thinking a square is actually active when it's just the engine getting
+// itself initialized.
+// ----------------------------------------------------------------------------
+
+function onActiveSquare() {
+  w("onActiveSquare");
+  const ref = gameref('active_square');
+  ref.on('value', async data => {
+    const value = data.val();
+    w("data is..");
+    w(JSON.stringify(value));
+    if (value) {
+      await tell('active_square', value);
+      await startQuestionTimer();
+    }
   });
 }
 
@@ -439,6 +468,7 @@ async function writechar(c) {
 async function writechar_browser(c) {
   return new Promise(resolve => {
     let x = document.getElementById("guidance");
+    x.scrollTop = x.scrollHeight;
     if (x.value.length)
       x.value = x.value + c;
     else
@@ -720,13 +750,18 @@ async function closeQuestion(topic, amt) {
 // of topic wrong and amt wrong
 
 function fullquestion(topic, amt) {
-  amt = parseInt(amt);
+  if (typeof amt === 'string')
+    amt = parseInt(amt);
   if (isNaN(amt))
     throw `amount is not a valid dollar value`;
-  const _topic = questions_[topic];
-  if (!_topic)
+  w(topic);
+  w(amt);
+  w(questions_);
+  const col = questions_[topic];
+  w(col);
+  if (!col)
     throw `topic ${topic} is not valid`;
-  return questions_[topic][amt / 200 - 1];
+  return col[amt / 200 - 1];
 }
 
 // ----------------------------------------------------------------------------
@@ -742,16 +777,29 @@ function fullquestion(topic, amt) {
 // ----------------------------------------------------------------------------
 
 async function question(topic, amt) {
+
+  // --------------------------------------------------------------------------
+  // Called to set the active square and close off this question from further
+  // selection. Once selected, the question cannot be re-used and this
+  // function assures us of that. Lives inside question() because question()
+  // is the only valid place that setActiveSquare should be called.
+  // --------------------------------------------------------------------------
+
+  async function setActiveSquare(topic, amt, question) {
+    w(`setActiveSquare for topic ${topic} and amt ${amt}`);
+    const ref = gameref('active_square');
+    await ref.set({t: topic, a: amt, q: question});
+    const questionref = gameref('questions').child(topic).child(amt / 200 - 1);
+    await questionref.child('open').set(false);
+  }
+
   const x = fullquestion(topic, amt);
   if (!x)
     throw `invalid topic ${topic} or amt ${amt}`;
   if (!x.open)
     throw `question already played, no longer available ${topic} ${amt}`;
-  if (gameid_ && whosturn_ == name_) {
-    let ref = gameref('active_square');
-    await closeQuestion(topic, amt);
-    await ref.set([topic, amt]);
-  }
+  if (gameid_ && whosturn_ == name_)
+    await setActiveSquare(topic, amt, x.q);
   await msg("And the question is");
   await msg(x.q);
   return x.q;
@@ -760,16 +808,13 @@ async function question(topic, amt) {
 async function revealTopics() {
   await dmsg(1, "Time to reveal today's topics.");
   const topics = Object.keys(questions_);
-  if (cb_)
-    cb_('topic_reveal_starts', topics.length);
+  await tell('topic_reveal_starts', topics.length);
   await msg(`We have ${topics.length} topics for our game.`);
   for (let i = 0; i < topics.length; ++i) {
-    if (cb_)
-      cb_('topic', [i, topics[i]]);
+    await tell('topic', [i, topics[i]]);
     await dmsg(1, `Topic is ${topics[i]}.`);
   }
-  if (cb_)
-    cb_('topic_reveal_ends', topics.length);
+  await tell('topic_reveal_ends', topics.length);
   await dmsg(1, 'All topics are now revealed!');
 }
 
@@ -832,14 +877,21 @@ async function readyToPlay(optName) {
 
       gameid_ = enrolling.filter(x => x.startsWith('gameid-'))[0];
       gameid_ = gameid_.replace('gameid-', '');
-      if (enrolling.some(enrollingNm => enrollingNm == name_))
+      console.warn(gameid_);
+      if (enrolling.some(enrollingNm => enrollingNm == name_)) {
+        w("aaa 5");
         return;
+      }
+      w("aaa 1");
       installGameListeners();
       if (enrolling.length <= NUM_PLAYERS - 1) {
+        w("aaa 2");
         enrolling.push(name_);
         ++enrolled_count;
         return enrolling;
       }
+      w("aaa 3");
+      w(name_);
       enrolling.push(name_);
       enrollees = enrolling;
       return null;
@@ -856,11 +908,11 @@ async function readyToPlay(optName) {
     await msg("Welcome " + name_ + "!");
     switch (enrolled_count) {
       case NUM_PLAYERS:
-        await msg("You are the first contestant for a new enrolling game");
+        await msg("You are the first contestant for a new enrolling game.");
         await msg(`Waiting for ${NUM_PLAYERS - enrolled_count + 1} more to join..`);
         break;
       case NUM_PLAYERS + 1:
-        await msg("You are the second contestant for a new enrolling game");
+        await msg("You are the second contestant for a new enrolling game.");
         await msg(`Waiting for ${NUM_PLAYERS - enrolled_count + 1} more to join..`);
         break;
       default:
@@ -879,10 +931,9 @@ async function readyToPlay(optName) {
   await gameref('players').set(x);
   await setQuestions(await loadQuestions());
   await msg("We now have a quorum of players!");
-  await dmsg(1, "Game will start momentarily..");
+  await dmsg(2, "Game will start momentarily..");
   await revealTopics();
   await setWhosTurn(name_);
-  await closeQuestion('CSS', 1000);
 }
 
 // ----------------------------------------------------------------------------
@@ -890,6 +941,7 @@ async function readyToPlay(optName) {
 // ----------------------------------------------------------------------------
 
 async function installGameListeners() {
+  onActiveSquare();
   onMsg();
   onPlayers();
   onQuestions();
@@ -913,18 +965,21 @@ async function isEnrolling() {
 // ----------------------------------------------------------------------------
 
 async function signOut() {
+  alert("signOut");
   if (isEnrolling()) {
     let ref = db().ref('/enrolling');
     ref.set(null);
   }
   gameref().set(null);
   await app().auth().signOut();
+  await msg(`${name_} has signed out, sorry but this game is over!`);
 }
 
 module.exports = {
   buzzin,
   onMsg,
   question,
+  readyToPlay,
   signOut,
   start,
   test
