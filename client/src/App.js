@@ -7,7 +7,7 @@ import {
   InMemoryCache,
   ApolloProvider
 } from '@apollo/client';
-import Play from './Play';
+import Play from './components/Play';
 import Admin from './Admin';
 import Container from 'react-bootstrap/Container';
 
