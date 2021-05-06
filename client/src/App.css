@@ -36,16 +36,70 @@ textarea {
   font-size: .8em;
   font-family: 'Calibri';
   font-weight: bold;
-  margin-left: 20px;
+  align-content: flex-end;
+  width:100%;
+  height:100%; 
+  box-sizing: border-box; 
+  /* margin-left: 20px; */
+}
+
+#buzzin, #answer {
+  width: 100%;
+  height: 100%;
 }
 
 button {
   margin-top: 0px;
   margin-right: 10px;
   margin-bottom: 10px;
+  width: 100%;
+  height: 100%;
+}
+
+.card-body {
+  color: gold;
+  font-weight: bold;
+  background-color: navy;
+  width: 100%;
+  height: 100%;
 }
 
 .test-1 {
   margin-bottom: 10px;
 }
 
+.topic-col {
+}
+
+.only-row-below-board {
+}
+
+.whosturn {
+  font-weight: bold;
+}
+
+.timeleft {
+  font-weight: bold;
+}
+
+.board-col {
+  margin-left: 20px;
+}
+
+.host-guidance {
+  border: 1px solid purple;
+}
+
+.your-answer-row {
+  border: 1px solid purple;
+}
+
+.your-answer-col {
+  border: 1px solid green;
+}
+
+.square-used {
+  width: 100%;
+  height: 100%;
+  background-color: red;
+}

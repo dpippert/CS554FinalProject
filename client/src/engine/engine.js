@@ -119,7 +119,6 @@ async function onQuestionTimer() {
   ref.on('value', async data => {
     const val = data.val();
     if (val === 0) {
-      console.error('val === 0');
       await tell('question_time_out', null);
       if (whosturn_ == name_)
         await judgeAnswers();
@@ -128,8 +127,6 @@ async function onQuestionTimer() {
     if (!val)
       return;
     await tell('question_timer', val);
-    w(whosturn_);
-    w(name_);
     if (whosturn_ == name_) {
       if (val == 10)
         msg("You have 10 seconds left to buzz in your answer.");
@@ -181,7 +178,7 @@ async function judgeAnswers() {
         players_[answer.name].balance += win;
         const playersref = gameref('players');
         await playersref.set(players_);
-        await msg(`Adjusting player ${answer.name} balance by + ${win}.`);
+        await msg(`Adjusting player ${answer.name} balance by +${win}.`);
         setWhosTurn(answer.name);
         doneans = true;
         doneent = true;
@@ -194,7 +191,7 @@ async function judgeAnswers() {
       players_[answer.name].balance -= win;
       const playersref = gameref('players');
       await playersref.set(players_);
-      await msg(`Adjusting player ${answer.name} balance by - ${win}.`);
+      await msg(`Adjusting player ${answer.name} balance by -${win}.`);
     }
   }
   if (!doneent) {
@@ -251,21 +248,6 @@ async function onWhosTurn() {
   });
 }
 
-/* no longer used
-async function doRoundGUI() {
-  try {
-    await dmsg(2, `Go ahead, your turn ${name_}`);
-    await msg(`${name_} chooses ${topic} for ${amt}`); // NO these are undefined $topic $amt DPTEST
-    await startQuestionTimer();
-  }
-  catch (e) {
-    console.warn(e);
-    await display(e);
-    await doRoundGUI();
-  }
-}
-*/
-
 // ----------------------------------------------------------------------------
 // DOes not send out the chooses msg until question has returned, meaning it
 // did not throw, meaning topic and amt are valid.
@@ -289,7 +271,7 @@ async function doRoundConsole() {
 // Expects a callback function where all events will be reported.
 // If no callback function is passed in, engine uses an internal default
 // callback function and assumes it is running standalone on a terminal with
-// with no browser driving it.
+// no browser driving it.
 // ----------------------------------------------------------------------------
 
 async function start(cb) {
@@ -316,7 +298,7 @@ async function start(cb) {
             buzzin_fn: buzzin};
   }
   catch (e) {
-    w(e);
+    console.error(e);
   }
 }
 
@@ -404,12 +386,9 @@ function onPlayers() {
 // ----------------------------------------------------------------------------
 
 function onActiveSquare() {
-  w("onActiveSquare");
   const ref = gameref('active_square');
   ref.on('value', async data => {
     const value = data.val();
-    w("data is..");
-    w(JSON.stringify(value));
     if (value) {
       await tell('active_square', value);
       await startQuestionTimer();
@@ -429,6 +408,14 @@ function onQuestions() {
   ref.on('value', data => {
     if (data.val())
       questions_ = data.val();
+  });
+}
+
+function onReveal() {
+  const ref = gameref('reveal');
+  ref.on('value', data => {
+    if (data.val())
+      tell('reveal', data.val());
   });
 }
 
@@ -514,7 +501,6 @@ function tts(str) {
     }
     if (!TTS_ENABLED)
       return null;
-    w("aaa 1");
     if (!synth_)
       throw 'speech synthesis is not initialized';
     if (!zira_) {
@@ -754,11 +740,7 @@ function fullquestion(topic, amt) {
     amt = parseInt(amt);
   if (isNaN(amt))
     throw `amount is not a valid dollar value`;
-  w(topic);
-  w(amt);
-  w(questions_);
   const col = questions_[topic];
-  w(col);
   if (!col)
     throw `topic ${topic} is not valid`;
   return col[amt / 200 - 1];
@@ -786,7 +768,6 @@ async function question(topic, amt) {
   // --------------------------------------------------------------------------
 
   async function setActiveSquare(topic, amt, question) {
-    w(`setActiveSquare for topic ${topic} and amt ${amt}`);
     const ref = gameref('active_square');
     await ref.set({t: topic, a: amt, q: question});
     const questionref = gameref('questions').child(topic).child(amt / 200 - 1);
@@ -806,15 +787,21 @@ async function question(topic, amt) {
 }
 
 async function revealTopics() {
+
+  async function setReveal(ntopic, topic) {
+    const ref = gameref('reveal');
+    await ref.set([ntopic, topic]);
+  }
+
   await dmsg(1, "Time to reveal today's topics.");
   const topics = Object.keys(questions_);
-  await tell('topic_reveal_starts', topics.length);
+//  await tell('topic_reveal_starts', topics.length); not needed?
   await msg(`We have ${topics.length} topics for our game.`);
   for (let i = 0; i < topics.length; ++i) {
-    await tell('topic', [i, topics[i]]);
+    await setReveal(i, topics[i]);
     await dmsg(1, `Topic is ${topics[i]}.`);
   }
-  await tell('topic_reveal_ends', topics.length);
+//  await tell('topic_reveal_ends', topics.length); not needed?
   await dmsg(1, 'All topics are now revealed!');
 }
 
@@ -877,27 +864,20 @@ async function readyToPlay(optName) {
 
       gameid_ = enrolling.filter(x => x.startsWith('gameid-'))[0];
       gameid_ = gameid_.replace('gameid-', '');
-      console.warn(gameid_);
-      if (enrolling.some(enrollingNm => enrollingNm == name_)) {
-        w("aaa 5");
+      if (enrolling.some(enrollingNm => enrollingNm == name_))
         return;
-      }
-      w("aaa 1");
       installGameListeners();
       if (enrolling.length <= NUM_PLAYERS - 1) {
-        w("aaa 2");
         enrolling.push(name_);
         ++enrolled_count;
         return enrolling;
       }
-      w("aaa 3");
-      w(name_);
       enrolling.push(name_);
       enrollees = enrolling;
       return null;
     }
     catch (e) {
-      console.warn(e);
+      console.error(e);
     }
   });
   if (!result.committed) {
@@ -946,6 +926,7 @@ async function installGameListeners() {
   onPlayers();
   onQuestions();
   onQuestionTimer();
+  onReveal();
   onWhosTurn();
   setWhosTurn(null);
 }

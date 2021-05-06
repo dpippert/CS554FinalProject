@@ -7,9 +7,10 @@ import {
   InMemoryCache,
   ApolloProvider
 } from '@apollo/client';
-import Play from './components/Play';
+import Play from './Play';
 import Admin from './Admin';
 import Container from 'react-bootstrap/Container';
+import Test2 from './Test2';
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
@@ -35,6 +36,7 @@ function App() {
             </nav>
           </header>
           <Container fluid>
+            <Route exact path="/test2" component={Test2}/>
             <Route exact path="/play" component={Play}/>
             <Route exact path="/admin" component={Admin}/>
           </Container>

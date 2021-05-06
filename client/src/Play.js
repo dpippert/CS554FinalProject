@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
-import '../App.css';
+import './App.css';
 import {} from '@apollo/client';
-import '../engine/engine'
+import './engine/engine'
 
 function Play(props) {
   const [username, setUsername] = useState('');
