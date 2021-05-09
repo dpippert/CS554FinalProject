@@ -39,6 +39,10 @@ function App() {
             <Route exact path="/test2" component={Test2}/>
             <Route exact path="/play" component={Play}/>
             <Route exact path="/admin" component={Admin}/>
+            <Route exact path="/signin" component={SignIn}/>
+            <Route exact path="/signup" component={SignUp}/>
+            <Route exact path="/changepassword" component={ChangePassword}/>
+            <Route exact path="/forgortpassword" component={ForgotPassword}/>
           </Container>
         </div>
       </Router>
