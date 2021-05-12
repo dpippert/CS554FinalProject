@@ -49,6 +49,8 @@ textarea {
 }
 
 button {
+  font-weight: bold;
+  color: gold;
   margin-top: 0px;
   margin-right: 10px;
   margin-bottom: 10px;
@@ -102,4 +104,13 @@ button {
   width: 100%;
   height: 100%;
   background-color: red;
+}
+
+.table {
+  background-color: white;
+}
+
+.table thead {
+  color: white;
+  background-color: navy;
 }

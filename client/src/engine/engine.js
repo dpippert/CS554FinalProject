@@ -118,18 +118,16 @@ async function onQuestionTimer() {
   ref.off();
   ref.on('value', async data => {
     const val = data.val();
-    if (val === 0) {
+    if (val < 0) {
       await tell('question_time_out', null);
       if (whosturn_ == name_)
         await judgeAnswers();
       return;
     }
-    if (!val)
-      return;
     await tell('question_timer', val);
     if (whosturn_ == name_) {
-      if (val == 10)
-        msg("You have 10 seconds left to buzz in your answer.");
+      if (val == 6)
+        msg("5 seconds left");
       question_timer_ = setTimeout(_ => {
         if (val >= 0) ref.set(val - 1);
       }, 1000);
@@ -202,7 +200,7 @@ async function judgeAnswers() {
     else
       await msg(`The correct answer was ${joined}.`);
     const nm = leadPlayer();
-    await msg(`${nm} you're in the lead with ${players_[nm].balance} dollars.`);
+    await msg(`${nm}, you're in the lead with ${players_[nm].balance} dollars.`);
     setWhosTurn(nm);
   }
 }

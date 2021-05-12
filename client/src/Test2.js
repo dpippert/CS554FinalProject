@@ -6,6 +6,7 @@ import Col from 'react-bootstrap/Col';
 import FormControl from 'react-bootstrap/FormControl';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Row from 'react-bootstrap/Row';
+import Table from 'react-bootstrap/Table';
 import engine from './engine/engine';
 
 const w = console.debug;
@@ -18,21 +19,29 @@ function Test2(props) {
 	const [topics, setTopics] = useState(['', '', '', '', '']);
   const [usedSquares, setUsedSquares] = useState([]);
   const [eng, setEng] = useState(null);
+	const [players, setPlayers] = useState({});
 
   useEffect(() => {
 
-     // active_square event data is {t: a: q:} where t: is topic,
-     // a: is amount, and q: is the question.
+    // active_square event data is {t: a: q:} where t: is topic,
+    // a: is amount, and q: is the question.
 
-     async function doActiveSquareEv(data) {
-       setMainstate('active_square');
-       document.getElementById("answer").value = '';
-       usedSquares.push(data);
-       setUsedSquares(usedSquares);
-     }
+    async function doActiveSquareEv(data) {
+      setMainstate('active_square');
+      document.getElementById("answer").value = '';
+      usedSquares.push(data);
+      setUsedSquares(usedSquares);
+    }
 
-     async function engineer(evname, evdata) {
-			switch (evname) {
+    async function engineer(evname, evdata) {
+      switch (evname) {
+			  case 'players':
+				  w(evdata);
+				  setPlayers(evdata);
+					break;
+			  case 'question_timer':
+				  document.getElementById('timeleft').value = evdata;
+					break;
 			  case 'reveal':
 				  const [n, topic] = evdata;
 					topics[n] = topic;
@@ -46,6 +55,7 @@ function Test2(props) {
           break;
 				case 'whosturn':
           setWhosturn(evdata);
+				  document.getElementById('whosturn').value = evdata;
           setTopicamt(null);
 					break;
 				default:
@@ -133,15 +143,24 @@ function Test2(props) {
 	// Hack alert the event is coming in for the child Card element
 	// for some reason. Need to get the button as that's where the id lives.
 
-	function squareClicked(ev) {
+	function checkTurn() {
 	  if (!isMyTurn()) {
-		  alert(`It's not your turn. It's ${whosturn}'s turn.`);
-			return;
+		  if (whosturn)
+  		  alert(`It's not your turn. It's ${whosturn}'s turn.`);
+      else
+			  alert(`It's not your turn. In fact, it's no one's turn.`);
+      return false;
     }
 		else if (mainstate !== 'playing') {
 		  w(`ignoring pick in mainstate ${mainstate}`);
-			return;
+			return false;
     }
+		return true;
+	}
+
+	function squareClicked(ev) {
+	  if (!checkTurn())
+		  return;
     const btn = ev.target.parentElement.parentElement;
 	  const id = btn.id;
 		const [_, ncol, nrow] = id.split("-");
@@ -263,7 +282,7 @@ function Test2(props) {
         </Row>
         <Row>
           <Col>
-            scoreboard goes here
+					  <Scoreboard players={players}/>
           </Col>
         </Row>
       </Col>
@@ -271,6 +290,46 @@ function Test2(props) {
     </>
   );
 }
+
+//					  <Scoreboard players={players}/>
+
+function Scoreboard(props) {
+
+	function trows() {
+	  w("aaa trows");
+		return Object.entries(props.players).map(entry => trow(entry[0], entry[1]));
+  }
+
+  function trow(name, value) {
+	  w("trow");
+		w("name");
+		w(name);
+		w("value");
+		w(value);
+	  return (
+		  <tr key={name}>
+			  <td>{name}</td>
+				<td>{value.balance}</td>
+			</tr>
+    );
+  }
+
+  return (
+    <Table bordered hover size="sm">
+      <thead>
+        <tr>
+          <th>Player</th>
+          <th>Balance</th>
+        </tr>
+      </thead>
+      <tbody>
+			  {trows()}
+      </tbody>
+    </Table>
+  );
+}
+
+//			  {trows()}
 
 // ----------------------------------------------------------------------------
 // Understanding mainstate.
