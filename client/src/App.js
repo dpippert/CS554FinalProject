@@ -40,14 +40,10 @@ function App() {
                 <img className="logo" src='./topictempest_small.png' alt="Topic Tempest logo"/>
               </NavLink>
             </Col>
+          </Row>
             <Route exact path="/test2" component={Test2}/>
             <Route exact path="/play" component={Play}/>
             <Route exact path="/admin" component={Admin}/>
-            <Route exact path="/signin" component={SignIn}/>
-            <Route exact path="/signup" component={SignUp}/>
-            <Route exact path="/changepassword" component={ChangePassword}/>
-            <Route exact path="/forgortpassword" component={ForgotPassword}/>
-          </Row>
         </Container>
       </Router>
     </ApolloProvider>
