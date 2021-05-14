@@ -10,6 +10,11 @@
   background: url('./topictempest.png') no-repeat;
 }
 
+.Google{
+  background: url('./btn_google_signin.png') no-repeat;
+  height: 150px;
+  width:150px;
+}
 nav {
 	list-style: none;
 	font-weight: bold;

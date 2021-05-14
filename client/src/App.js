@@ -11,6 +11,11 @@ import Play from './Play';
 import Admin from './Admin';
 import Container from 'react-bootstrap/Container';
 import Test2 from './Test2';
+import SignIn from './SignIn';
+import SignUp from './SignUp';
+import ChangePassword from './ChangePassword';
+import {AuthProvider} from './firebase/Auth'
+import PrivateRoute from './PrivateRoute'
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
@@ -21,8 +26,11 @@ const client = new ApolloClient({
 
 function App() {
   return (
-    <ApolloProvider client={client}>
-      <Router>
+   
+    <ApolloProvider client={client}> 
+     
+     <AuthProvider>
+        <Router>
         <div>
           <header className="App-header">
             <div className="topictempest"></div>
@@ -38,15 +46,17 @@ function App() {
           <Container fluid>
             <Route exact path="/test2" component={Test2}/>
             <Route exact path="/play" component={Play}/>
-            <Route exact path="/admin" component={Admin}/>
+            <PrivateRoute exact path="/admin" component={Admin}/>
             <Route exact path="/signin" component={SignIn}/>
             <Route exact path="/signup" component={SignUp}/>
             <Route exact path="/changepassword" component={ChangePassword}/>
-            <Route exact path="/forgortpassword" component={ForgotPassword}/>
-          </Container>
+            {/* <Route exact path="/forgortpassword" component={ForgotPassword}/> */}
+  </Container>
         </div>
       </Router>
-    </ApolloProvider>
+      </AuthProvider>
+    </ApolloProvider> 
+   
   );
 }
 
