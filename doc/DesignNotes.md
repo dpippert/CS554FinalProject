@@ -71,16 +71,19 @@ a question/answer game format.
 
 ## Application architecture
 
+<img src="./Arch.png" alt="application architecture"/>
+
 1. UI is a *single page application (SPA)* based on the React framework. SPA is served
-from an Apollo GraphQL Node.js server. Their are two application databases. The first
-is a Mongo database holding questions and answers that are used during game play. The
+from an Apollo GraphQL Node.js server. There are two application databases. The first
+is a Mongo database holding topics, questions, and answers. The
 second database is a Firebase *realtime database* that synchronizes game state across
 browsers.
 
 ## Authentication
 
 Authentication comes in two flavors depending on whether you are simply *playing*
-or if you want to perform CRUD operations against the Q/A database.
+the Topic Tempest game, or if you want to perform CRUD operations against the
+general purpose Q/A database.
 
 ### Game play authentication
 
