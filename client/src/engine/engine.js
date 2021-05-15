@@ -18,7 +18,7 @@ let synth_;
 let zira_;
 let voices_;
 
-const w = console.debug;
+const w = console.warn;
 
 const APP_NAME = "tempest";
 
@@ -118,18 +118,16 @@ async function onQuestionTimer() {
   ref.off();
   ref.on('value', async data => {
     const val = data.val();
-    if (val === 0) {
+    if (val < 0) {
       await tell('question_time_out', null);
       if (whosturn_ == name_)
         await judgeAnswers();
       return;
     }
-    if (!val)
-      return;
     await tell('question_timer', val);
     if (whosturn_ == name_) {
-      if (val == 10)
-        msg("You have 10 seconds left to buzz in your answer.");
+      if (val == 6)
+        msg("5 seconds left");
       question_timer_ = setTimeout(_ => {
         if (val >= 0) ref.set(val - 1);
       }, 1000);
@@ -179,7 +177,7 @@ async function judgeAnswers() {
         const playersref = gameref('players');
         await playersref.set(players_);
         await msg(`Adjusting player ${answer.name} balance by +${win}.`);
-        setWhosTurn(answer.name);
+        advance(answer.name);
         doneans = true;
         doneent = true;
         break;
@@ -202,8 +200,8 @@ async function judgeAnswers() {
     else
       await msg(`The correct answer was ${joined}.`);
     const nm = leadPlayer();
-    await msg(`${nm} you're in the lead with ${players_[nm].balance} dollars.`);
-    setWhosTurn(nm);
+    await msg(`${nm}, you're in the lead with ${players_[nm].balance} dollars.`);
+    advance(nm);
   }
 }
 
@@ -358,6 +356,8 @@ async function loadQuestions() {
 }
 
 async function setQuestions(questions) {
+  w("setting questions");
+  w(JSON.stringify(questions));
   const ref = gameref('questions');
   await ref.set(questions);
 }
@@ -406,8 +406,11 @@ function onActiveSquare() {
 function onQuestions() {
   const ref = gameref('questions');
   ref.on('value', data => {
-    if (data.val())
+    if (data.val()) {
       questions_ = data.val();
+      w("the onQuestions questions_ are");
+      w(JSON.stringify(questions_));
+    }
   });
 }
 
@@ -652,47 +655,122 @@ let questions_ = {
 
            {q: "Main content goes here.",
             a: ["body", "<body>"],
-            open: true,
+            open: false,
             w: 400},
 
            {q: "Main content goes here.",
             a: ["body", "<body>"],
-            open: true,
+            open: false,
             w: 600},
 
            {q: "Main content goes here.",
             a: ["body", "<body>"],
-            open: true,
+            open: false,
             w: 800},
 
            {q: "Main content goes here.",
             a: ["body", "<body>"],
-            open: true,
+            open: false,
             w: 1000}],
+
+  "Nodejs": [{q: "Class selectors start with this character",
+              a: [".", "period", "dot"],
+              open: false,
+              w: 200},
+
+             {q: "Class selectors start with this character",
+              a: [".", "period", "dot"],
+              open: false,
+              w: 400},
+
+             {q: "Class selectors start with this character",
+              a: [".", "period", "dot"],
+              open: false,
+              w: 600},
+
+             {q: "Class selectors start with this character",
+              a: [".", "period", "dot"],
+              open: false,
+              w: 800},
+
+             {q: "Class selectors start with this character",
+              a: [".", "period", "dot"],
+              open: false,
+              w: 1000}],
+
+  "React": [{q: "Class selectors start with this character",
+             a: [".", "period", "dot"],
+             open: false,
+             w: 200},
+
+            {q: "Class selectors start with this character",
+             a: [".", "period", "dot"],
+             open: false,
+             w: 400},
+
+            {q: "Class selectors start with this character",
+             a: [".", "period", "dot"],
+             open: false,
+             w: 600},
+
+            {q: "Class selectors start with this character",
+             a: [".", "period", "dot"],
+             open: false,
+             w: 800},
+
+            {q: "Class selectors start with this character",
+             a: [".", "period", "dot"],
+             open: false,
+             w: 1000}],
+
+  "MongoDB": [{q: "Class selectors start with this character",
+               a: [".", "period", "dot"],
+               open: true,
+               w: 200},
+
+              {q: "Class selectors start with this character",
+               a: [".", "period", "dot"],
+               open: false,
+               w: 400},
+
+              {q: "Class selectors start with this character",
+               a: [".", "period", "dot"],
+               open: false,
+               w: 600},
+
+              {q: "Class selectors start with this character",
+               a: [".", "period", "dot"],
+               open: false,
+               w: 800},
+
+              {q: "Class selectors start with this character",
+               a: [".", "period", "dot"],
+               open: false,
+               w: 1000}],
 
   "CSS": [{q: "Class selectors start with this character",
            a: [".", "period", "dot"],
-           open: true,
+           open: false,
            w: 200},
 
           {q: "Class selectors start with this character",
            a: [".", "period", "dot"],
-           open: true,
+           open: false,
            w: 400},
 
           {q: "Class selectors start with this character",
            a: [".", "period", "dot"],
-           open: true,
+           open: false,
            w: 600},
 
           {q: "Class selectors start with this character",
            a: [".", "period", "dot"],
-           open: true,
+           open: false,
            w: 800},
 
           {q: "Class selectors start with this character",
            a: [".", "period", "dot"],
-           open: true,
+           open: false,
            w: 1000}]};
 
 // ----------------------------------------------------------------------------
@@ -768,17 +846,20 @@ async function question(topic, amt) {
   // --------------------------------------------------------------------------
 
   async function setActiveSquare(topic, amt, question) {
+    w("setActiveSquare");
     const ref = gameref('active_square');
     await ref.set({t: topic, a: amt, q: question});
     const questionref = gameref('questions').child(topic).child(amt / 200 - 1);
     await questionref.child('open').set(false);
   }
 
+  w("before fullquestion");
   const x = fullquestion(topic, amt);
   if (!x)
     throw `invalid topic ${topic} or amt ${amt}`;
   if (!x.open)
     throw `question already played, no longer available ${topic} ${amt}`;
+  w("after fullquestion");
   if (gameid_ && whosturn_ == name_)
     await setActiveSquare(topic, amt, x.q);
   await msg("And the question is");
@@ -803,6 +884,74 @@ async function revealTopics() {
   }
 //  await tell('topic_reveal_ends', topics.length); not needed?
   await dmsg(1, 'All topics are now revealed!');
+}
+
+async function onGameOver() {
+  const ref = gameref('gameover');
+  ref.off();
+  ref.on('value', async data => {
+    if (data.val())
+      await tell('game_over');
+  });
+}
+
+async function advance(name) {
+  const qs = await checkGameOver();
+  if (qs)
+    await setWhosTurn(name);
+}
+
+// ----------------------------------------------------------------------------
+// Called from setWhosTurn to first see if the game is over ie all the squares
+// have been used. If so it sends game_over event.
+// ----------------------------------------------------------------------------
+
+async function checkGameOver() {
+
+  async function setGameOver() {
+    await gameref('whosturn').set("");
+    await gameref('active_square').set(null);
+    await gameref('gameover').set(true);
+  }
+
+  let gameOver = true;
+  const keys = Object.keys(questions_);
+  for (var i = 0; i < keys.length && gameOver; ++i) {
+    const topic = questions_[keys[i]];
+    for (var j = 0; j < topic.length; ++j) {
+      const x = topic[j];
+      if (x.open)
+        gameOver = false;
+    }
+  }
+  if (!gameOver)
+    return false;
+
+  const winningBalance = Object.entries(players_).reduce((rsf, ni) => {
+    return ni[1].balance > rsf ? ni[1].balance : rsf;
+  }, 0);
+  dmsg(2, "The game has finished.");
+  dmsg(2, `Winning balance is ${winningBalance}.`);
+  const winners = Object.entries(players_).filter(p => {
+    return p[1].balance === winningBalance;
+  });
+  let winnerNames;
+  if (winners.length > 1) {
+    for (var x = 0; x < winners.length; ++w) {
+      if (x > 0)
+        winnerNames += ", ";
+      if (x + 1 === winners.length)
+        winnerNames += "and ";
+      winnerNames += winners[x][0];
+    }
+    dmsg(2, `The winners are ${winnerNames}.`);
+  }
+  else {
+    winnerNames = winners[0][0];
+    dmsg(2, `The winner is ${winnerNames}.`);
+  }
+  dmsg(1, "Thank you for playing Topic Tempest!");
+  setGameOver(true);
 }
 
 // ----------------------------------------------------------------------------
@@ -928,6 +1077,7 @@ async function installGameListeners() {
   onQuestionTimer();
   onReveal();
   onWhosTurn();
+  onGameOver();
   setWhosTurn(null);
 }
 

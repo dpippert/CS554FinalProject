@@ -6,9 +6,10 @@ import Col from 'react-bootstrap/Col';
 import FormControl from 'react-bootstrap/FormControl';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Row from 'react-bootstrap/Row';
+import Table from 'react-bootstrap/Table';
 import engine from './engine/engine';
 
-const w = console.debug;
+const w = console.warn;
 
 function Test2(props) {
   const [username, setUsername] = useState('');
@@ -18,34 +19,50 @@ function Test2(props) {
 	const [topics, setTopics] = useState(['', '', '', '', '']);
   const [usedSquares, setUsedSquares] = useState([]);
   const [eng, setEng] = useState(null);
+	const [players, setPlayers] = useState({});
+	const [activeSquare, setActiveSquare] = useState(null);
 
   useEffect(() => {
 
-     // active_square event data is {t: a: q:} where t: is topic,
-     // a: is amount, and q: is the question.
+    // active_square event data is {t: a: q:} where t: is topic,
+    // a: is amount, and q: is the question. When a round finishes the engine
+    // will send in 'null' for the active square so take care to filter
+    // that out.
 
-     async function doActiveSquareEv(data) {
-       setMainstate('active_square');
-       document.getElementById("answer").value = '';
-       usedSquares.push(data);
-       setUsedSquares(usedSquares);
-     }
+    async function doActiveSquareEv(data) {
+      document.getElementById("answer").value = '';
+      if (!data)
+        return;
+      setMainstate('active_square');
+			setActiveSquare(data);
+    }
 
-     async function engineer(evname, evdata) {
-			switch (evname) {
+    async function engineer(evname, evdata) {
+      switch (evname) {
+        case 'game_over':
+          setMainstate('game_over');
+          break;
+			  case 'players':
+				  setPlayers(evdata);
+					break;
+			  case 'question_timer':
+				  document.getElementById('timeleft').value = evdata;
+					break;
 			  case 'reveal':
 				  const [n, topic] = evdata;
 					topics[n] = topic;
 					setTopics(topics);
 					break;
         case 'question_time_out':
-          setMainstate('playing');
+          setMainstate('need_active_square_closed');
+//          setMainstate('playing');
           break;
         case 'active_square':
           doActiveSquareEv(evdata);
           break;
 				case 'whosturn':
           setWhosturn(evdata);
+				  document.getElementById('whosturn').value = evdata;
           setTopicamt(null);
 					break;
 				default:
@@ -66,9 +83,30 @@ function Test2(props) {
     startEngine();
   }, [topics, usedSquares]);
 
+  // Added hack of changing active_square to active_square_2 as it was the only
+  // way I could get non-current-turn browsers to render, otherwise when the
+  // question would come up on the square, the non-current-turn browsers did
+  // not display it for reasons unknown.
+
   useEffect(() => {
     async function action() {
       switch (mainstate) {
+        case 'game_over':
+          alert("Game over. Thank you for playing Topic Tempest!");
+          break;
+        case 'need_active_square_closed':
+          w("pushing activeSquare to usedSquares");
+          w(JSON.stringify(activeSquare));
+          usedSquares.push(activeSquare);
+  			  setActiveSquare(null);
+          setUsedSquares(usedSquares);
+          w("usedSquares is now")
+          w(JSON.stringify(usedSquares));
+          setMainstate('playing');
+				  break;
+        case 'active_square':
+          setMainstate('active_square_2');
+          break;
         case 'buzzin-clicked':
           setMainstate('buzzed-in');
           await engine.buzzin(document.getElementById("answer").value);
@@ -78,6 +116,8 @@ function Test2(props) {
           await engine.question(topicamt[0], topicamt[1]);
           break;
         case 'playing':
+//          const gameOver = await engine.isGameOver();
+          break;
 				case 'waiting-for-active-square':
           break;
         case 'rtp-clicked':
@@ -89,7 +129,8 @@ function Test2(props) {
           break;
       }
     }
-    action();
+    try { action(); }
+    catch (e) { w(e); }
   });
 
   function onUsernameChange(ev) {
@@ -106,11 +147,11 @@ function Test2(props) {
   }
 
   function getAnswerEnabled() {
-    return mainstate === 'active_square';
+    return mainstate === 'active_square' || mainstate === 'active_square_2';
   }
 
   function getBuzzinEnabled() {
-    return mainstate === 'active_square';
+    return mainstate === 'active_square' || mainstate === 'active_square_2';
   }
 
   function isMyTurn() {
@@ -124,30 +165,52 @@ function Test2(props) {
   function isSquareUsed(ncol, nrow) {
     const topic = topics[ncol];
     function f(square) {
-      return (square.t === topic) && (square.a === ((nrow + 1) * 200));
+		  return ((square.t === topic) && (square.a === ((nrow + 1) * 200))) ?
+			  square : false;
     }
     return usedSquares.some(f);
+  }
+
+	function isSquareActive(ncol, nrow) {
+    const [topic, amt] = asTopicAmt(ncol, nrow);
+		return activeSquare && activeSquare.t === topic && activeSquare.a === amt;
   }
 
   // Format of the id attr is "square-${ntopic}-${nrow}".
 	// Hack alert the event is coming in for the child Card element
 	// for some reason. Need to get the button as that's where the id lives.
 
-	function squareClicked(ev) {
+	function checkTurn() {
 	  if (!isMyTurn()) {
-		  alert(`It's not your turn. It's ${whosturn}'s turn.`);
-			return;
+		  if (whosturn)
+  		  alert(`It's not your turn. It's ${whosturn}'s turn.`);
+      else
+			  alert(`It's not your turn. In fact, it's no one's turn.`);
+      return false;
     }
 		else if (mainstate !== 'playing') {
 		  w(`ignoring pick in mainstate ${mainstate}`);
-			return;
+			return false;
     }
+		return true;
+	}
+
+	// Returns a 2 vector [topic, amt] eg ["HTML", 200] corresponding to the
+  // passed in row and column numbers.
+
+	function asTopicAmt(nrow, ncol) {
+		const topic = topics[ncol];
+		const amt = (parseInt(nrow) + 1) * 200;
+    return [topic, amt]
+  }
+
+	function squareClicked(ev) {
+	  if (!checkTurn())
+		  return;
     const btn = ev.target.parentElement.parentElement;
 	  const id = btn.id;
 		const [_, ncol, nrow] = id.split("-");
-		const topic = topics[ncol];
-		const amt = (parseInt(nrow) + 1) * 200;
-		setTopicamt([topic, amt]);
+    setTopicamt(asTopicAmt(nrow, ncol));
 		setMainstate('square-clicked');
   }
 
@@ -166,27 +229,34 @@ function Test2(props) {
 		function renderSquare(nrow) {
 	    const k = `square-${ncol}-${nrow}`;
       const squareUsed = isSquareUsed(ncol, nrow);
-      if (squareUsed)
+      if (isSquareActive(nrow, ncol))
         return (
-				  <Row key={k}>
-            <button disabled className="square-used">${200 * (nrow + 1)}</button>
+			    <Row key={k}>
+            <button disabled className="square-active">{activeSquare.q}</button>
 				  </Row>
+        );
+      else if (squareUsed)
+        return (
+          <Row key={k}>
+            <button disabled className="square-used">${200 * (nrow + 1)}</button>
+          </Row>
         );
       else
 			  return (
 				  <Row key={k}>
-            <Button id={k} onClick={squareClicked}>
-              <Card body className={squareUsed ? "square-used" : ""}>${200 * (nrow + 1)}</Card>
+            <Button id={k} className="dollar-btn" onClick={squareClicked}>
+              <Card body className={squareUsed ? "square-used" : "square-open"}>${200 * (nrow + 1)}</Card>
             </Button>
 				  </Row>
 			  );
 		}
 
+		// Why did I use an extra Row for each square on this and above renderSquare
+		// function. Doesn't seem needed to me.
+
     return (
       <Col key={`topic-col-${ncol}`} data-name='foo' className="topic-col">
-        <Row>
-          <Card body>{topics[ncol]}</Card>
-        </Row>
+        <Card className="topic">{topics[ncol]}</Card>
         {rows.map(renderSquare)}
       </Col>
     );
@@ -194,12 +264,8 @@ function Test2(props) {
 
   return (
     <>
-    <Row>
-      <Col className="board-col">
-        <Row>
-          {renderTopicCols()}
-        </Row>
-      </Col>
+    <Row xs={2} md={5}>
+      {renderTopicCols()}
     </Row>
     <Row className="only-row-below-board">
       <Col className="lhs-col-of-only-row-below-board">
@@ -263,7 +329,7 @@ function Test2(props) {
         </Row>
         <Row>
           <Col>
-            scoreboard goes here
+					  <Scoreboard players={players}/>
           </Col>
         </Row>
       </Col>
@@ -271,6 +337,40 @@ function Test2(props) {
     </>
   );
 }
+
+//					  <Scoreboard players={players}/>
+
+function Scoreboard(props) {
+
+	function trows() {
+		return Object.entries(props.players).map(entry => trow(entry[0], entry[1]));
+  }
+
+  function trow(name, value) {
+	  return (
+		  <tr key={name}>
+			  <td>{name}</td>
+				<td>{value.balance}</td>
+			</tr>
+    );
+  }
+
+  return (
+    <Table bordered hover size="sm">
+      <thead>
+        <tr>
+          <th>Player</th>
+          <th>Balance</th>
+        </tr>
+      </thead>
+      <tbody>
+			  {trows()}
+      </tbody>
+    </Table>
+  );
+}
+
+//			  {trows()}
 
 // ----------------------------------------------------------------------------
 // Understanding mainstate.

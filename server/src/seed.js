@@ -65,53 +65,89 @@ db.questions.insertMany(
      "q": "6 A selector always starts with this character.",
      "a": [".", "period"]},
 
-    {"t": "Node.js",
-     "q": "1 The original package manager is acronymed as this.",
-     "a": ["npm"]},
+    {"t": "New Jersey",
+     "q": "Current governor of New Jersey last name is",
+     "a": ["Murphy"]},
+
+    {"t": "New Jersey",
+     "q": "Capital city is",
+     "a": ["Trenton"]},
+
+    {"t": "New Jersey",
+     "q": "Major toll highway name is",
+     "a": ["New Jersey Turnpike"]},
+
+    {"t": "New Jersey",
+     "q": "State nickname is",
+     "a": ["Garden State", "The Garden State"]},
+
+    {"t": "New Jersey",
+     "q": "Casino and resort city is this",
+     "a": ["Atlantic City"]},
+
+    {"t": "New Jersey",
+     "q": "First word of major technology university is this",
+     "a": ["Stevens"]},
+
+    {"t": "New Jersey",
+     "q": "Stevens Institute of Technology is located in this city",
+     "a": ["Hoboken"]},
+
+    {"t": "New Jersey",
+     "q": "Stevens Institute mascot is this winged animal",
+     "a": ["Duck"]},
 
     {"t": "Node.js",
-     "q": "2 The original package manager is acronymed as this.",
-     "a": ["npm"]},
+     "q": "The most popular HTTP library is called this",
+     "a": ["axios"]},
 
     {"t": "Node.js",
-     "q": "3 The original package manager is acronymed as this.",
-     "a": ["npm"]},
+     "q": "Standard in, Standard out, and Standard error live in this module.",
+     "a": ["process"]},
 
     {"t": "Node.js",
-     "q": "4 The original package manager is acronymed as this.",
-     "a": ["npm"]},
+     "q": "Build a web app using this common server-side package",
+     "a": ["Express"]},
 
     {"t": "Node.js",
-     "q": "5 The original package manager is acronymed as this.",
-     "a": ["npm"]},
+     "q": "Use this file to list your application package dependencies",
+     "a": ["package.json"]},
 
     {"t": "Node.js",
-     "q": "6 The original package manager is acronymed as this.",
-     "a": ["npm"]},
+     "q": "Use this function to import a package into your app",
+     "a": ["require"]},
+
+    {"t": "Node.js",
+     "q": "To create an empty project from scratch, you can use this npm command",
+     "a": ["init"]},
+
+    {"t": "Node.js",
+     "q": "This special character finds use when specifying your package version dependencies",
+     "a": ["^", "caret"]},
 
     {"t": "React",
-     "q": "1 React was invented at this company.",
-     "a": ["facebook"]},
+     "q": "Creator of this framework, last name
+     "a": ["Walke"]},
 
     {"t": "React",
-     "q": "2 React was invented at this company.",
-     "a": ["facebook"]},
+     "q": "The hook used for managing function component state",
+     "a": ["useState"]},
 
     {"t": "React",
-     "q": "3 React was invented at this company.",
-     "a": ["facebook"]},
+     "q": "The hook used for running side effects after a render",
+     "a": ["useEffect"]},
 
     {"t": "React",
-     "q": "4 React was invented at this company.",
-     "a": ["facebook"]},
+     "q": "Bootstrapified react components can be had from this library",
+     "a": ["react-bootstrap", "react bootstrap"]},
 
     {"t": "React",
-     "q": "5 React was invented at this company.",
-     "a": ["facebook"]},
+     "q": "Installing a component into the current render tree is called this",
+     "a": ["mount", "mounting"]},
 
     {"t": "React",
-     "q": "6 React was invented at this company.",
-     "a": ["facebook"]},
+     "q": "Removing a component from the current render tree is called this",
+     "a": ["unmount", "unmounting"]},
 
     {"t": "SASS",
      "q": "1 The standard and original file extension for SASS files is this.",

@@ -9,7 +9,9 @@ import {
 } from '@apollo/client';
 import Play from './Play';
 import Admin from './Admin';
+import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
 import Test2 from './Test2';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
