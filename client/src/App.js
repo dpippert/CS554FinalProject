@@ -16,6 +16,7 @@ import SignUp from './SignUp';
 import ChangePassword from './ChangePassword';
 import {AuthProvider} from './firebase/Auth'
 import PrivateRoute from './PrivateRoute'
+import Navigation from './Navigation';
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
@@ -33,7 +34,8 @@ function App() {
         <Router>
         <div>
           <header className="App-header">
-            <div className="topictempest"></div>
+            <Navigation/>
+            {/* <div className="topictempest"></div>
             <nav>
               <NavLink className="navlink" to="/play">
                 Ready to Play! 
@@ -41,7 +43,7 @@ function App() {
               <NavLink className="navlink" to="/admin">
                 Our Question and Answer Database 
               </NavLink>
-            </nav>
+            </nav> */}
           </header>
           <Container fluid>
             <Route exact path="/test2" component={Test2}/>
