@@ -115,6 +115,8 @@ function Play(props) {
 				  break;
         case 'active_square':
           setMainstate('active_square_2');
+          document.getElementById("answer").focus();
+          w("aaa mainstate is active_square");
           break;
         case 'buzzin-clicked':
           setMainstate('buzzed-in');
@@ -175,10 +177,7 @@ function Play(props) {
 
   function getBuzzinEnabled() {
     const elem = document.getElementById("answer");
-    if (elem)
-      w(elem.value.length);
     const y = elem && !elem.value.length;
-    w(y);
     return mainstate === 'active_square' || mainstate === 'active_square_2';
   }
 

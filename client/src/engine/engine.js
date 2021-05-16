@@ -50,30 +50,17 @@ function db() {
 let initCount_ = 0;
 
 function init() {
-  // REVISIT this will cause compile error under nodejs, will need to
-  // move to a separate file and try requiring it, or eval a string.
-  // won't work in the face of body element changes, maybe body is stable though
-
-  /*
-  if (isBrowser()) {
-    const x = document.getElementsByTagName('body')[0];
-    w("adding event listener for sign out");
-    x.addEventListener('onunload', _ => {
-      alert("will sign out");
-      w("will sign out");
-      signOut();
-    });
-  }
-  */
-
   if (++initCount_ >= 2)
     console.error(`Too many inits of ${initCount_}`);
-  else
+  else {
     processQueue();
+    if (isBrowser())
+      window.addEventListener('unload', signOut);
+  }
 }
 
 const CHAR_DELAY = 80;
-const NUM_PLAYERS = 2; // 1 is broken DPTEST needs fixed
+const NUM_PLAYERS = 2;
 const QUESTION_TIME_SEC = 16;
 
 let players_ = {};
@@ -1123,18 +1110,23 @@ async function isEnrolling() {
 
 // ----------------------------------------------------------------------------
 // Erases the game from firebase. If the game is in the enrolling state, then
-// the /enrolling is also deleted.
+// the /enrolling is also deleted. CAVEAT I have found there is a race
+// condition of some sort going on due to the window trying to close down.
+// Have found it's best NOT to await the Promise calls in this function
+// but let them proceed in their own time. It is important to put the
+// critical removal of /enrolling first as that seems to always work, whereas
+// the next call to set the game to null, less critical and won't cause
+// issues on restart, sometimes does not occur.
 // ----------------------------------------------------------------------------
 
 async function signOut() {
-  alert("signOut");
   if (isEnrolling()) {
     let ref = db().ref('/enrolling');
     ref.set(null);
+    gameref().set(null);
   }
-  gameref().set(null);
-  await app().auth().signOut();
-  await dmsg(2, `${name_} has signed out, sorry but this game is over!`);
+  app().auth().signOut();
+  dmsg(2, `${name_} has signed out, sorry but this game is over!`);
 }
 
 function setSpeechEnabled(bool) {
