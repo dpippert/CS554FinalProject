@@ -6,9 +6,11 @@ show dbs
 
 use tempest
 
-use template
+use tempest
 
 db.dropDatabase()
+
+db.questions.drop()
 
 db.questions.find({t: "CSS"})
 
