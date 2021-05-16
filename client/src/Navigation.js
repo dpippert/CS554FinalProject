@@ -7,7 +7,7 @@ import firebase from 'firebase';
 
 
 
-import { AppBar, Toolbar, IconButton, Typography } from '@material-ui/core';
+import { AppBar, Toolbar } from '@material-ui/core';
 
 const Navigation = () => {
 	const { currentUser } = useContext(AuthContext);

@@ -1,21 +1,20 @@
 import React, {useEffect, useState} from 'react';
-import './App.css';
+import './GameBoard.css';
 import Button from 'react-bootstrap/Button';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/Col';
 import FormControl from 'react-bootstrap/FormControl';
-import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Row from 'react-bootstrap/Row';
 import Table from 'react-bootstrap/Table';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
+import {NavLink} from 'react-router-dom';
 import engine from './engine/engine';
 
 const w = console.warn;
 
-function Test2(props) {
+function Play(props) {
   const [username, setUsername] = useState('');
   const [mainstate, setMainstate] = useState('waiting-for-enroll-request');
   const [topicamt, setTopicamt] = useState('');
@@ -79,7 +78,8 @@ function Test2(props) {
     async function startEngine() {
       try {
 			  console.error("aaa startEngine calling");
-        setEng(await engine.start(engineer));
+        await engine.start(engineer);
+        //setEng(await engine.start(engineer));
       } catch (e) {
         console.error(e);
         alert(e);
@@ -321,6 +321,21 @@ function Test2(props) {
 
   return (
     <>
+    <Row className="top-row">
+      <Col className="top-cols" xs={4}>
+        <br/>
+        <NavLink className="navlink" to="/admin">Our Question and Answer Repository</NavLink>
+      </Col>
+      <Col xs={4}>
+        <br/>
+        <NavLink className="navlink" to="/play">Ready to Play!</NavLink>
+      </Col>
+      <Col xs={4}>
+        <NavLink className="navlink2" to="/test2">
+          <img className="logo" src='./topictempest_small.png' alt="Topic Tempest logo"/>
+        </NavLink>
+      </Col>
+    </Row>
     <Row xs={2} md={5}>
       {renderTopicCols()}
     </Row>
@@ -454,4 +469,4 @@ function Scoreboard(props) {
 // question before the last one has completed.
 // ----------------------------------------------------------------------------
 
-export default Test2;
+export default Play;

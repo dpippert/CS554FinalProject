@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { NavLink, BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import {
   ApolloClient,
   HttpLink,
@@ -9,9 +9,7 @@ import {
 } from '@apollo/client';
 import Play from './Play';
 import Admin from './Admin';
-import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 import ChangePassword from './ChangePassword';
