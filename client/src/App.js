@@ -12,7 +12,6 @@ import Admin from './Admin';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
-import Test2 from './Test2';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 import ChangePassword from './ChangePassword';
@@ -48,7 +47,6 @@ function App() {
             </nav> */}
           </header>
           <Container fluid>
-            <Route exact path="/test2" component={Test2}/>
             <Route exact path="/play" component={Play}/>
             <PrivateRoute exact path="/admin" component={Admin}/>
             <Route exact path="/signin" component={SignIn}/>
