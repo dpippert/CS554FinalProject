@@ -38,26 +38,38 @@ const NavigationAuth = () => {
 						position="relative"
 						style={{ background: '#ffffff' }}
 					>
-						<Toolbar>
+						
 							<div className="links title">
 							
-								<NavLink exact to="/play" activeClassName="active">
-								Ready to Play!      |
+								<NavLink
+									exact
+									to="/"
+									activeClassName="active"
+								>
+							Home   |
+
 								</NavLink>
-							</div>
-							<div className="links title">
-							
+                                
 								<NavLink
 									exact
 									to="/admin"
 									activeClassName="active"
 								>
-									Admin Database
+							Question-Answers Repo   |
+
 								</NavLink>
-							</div>
 							
+							<NavLink
+								exact
+								to="/play"
+								activeClassName="active"
+							>
+								Play    
+							</NavLink>
+						</div>
+						
 							
-						</Toolbar>
+					
 					</AppBar>
 				</nav>
 				
@@ -73,7 +85,7 @@ const NavigationNonAuth = () => {
 				
 				<AppBar position="relative" style={{ background: '#2E3B55', paddingLeft:"200px" }}>
 					<Toolbar style={{ color: 'black' }}>
-						<div className="links title">
+						<div >
 							<NavLink
 								exact
 								to="/play"
@@ -84,33 +96,16 @@ const NavigationNonAuth = () => {
 							</NavLink>
 						</div>
 
-						<div className="links title">
+						<div>
 							<NavLink
 								exact
 								to="/signin"
 								activeClassName="active"
 							>
-								Admin Database      |
+								Questions-answers Repo   
 							</NavLink>
 						</div>
-                        <div className="links title">
-							<NavLink
-								exact
-								to="/signup"
-								activeClassName="active"
-							>
-								Sign-up      |
-							</NavLink>
-						</div>
-						<div className="links title">
-							<NavLink
-								exact
-								to="/signin"
-								activeClassName="active"
-							>
-								Sign-In      
-							</NavLink>
-						</div>
+                      
 					</Toolbar>
 				</AppBar>
 			</nav>

@@ -1,6 +1,8 @@
 import React, { useContext } from 'react';
 import SocialSignIn from './SocialSignIn';
+import SignUp from "./SignUp"
 import { Redirect } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { AuthContext } from './firebase/Auth';
 import {
 	doSignInWithEmailAndPassword,
@@ -50,6 +52,17 @@ function SignIn() {
 			);
 		}
 	};
+	const newUser = (event) => {
+		event.preventDefault();
+		console.log("hiiiiiiiiii")
+	return (
+			<Redirect
+				to={{
+					pathname: '/signup',
+				}}
+			/>
+	);
+	};
 	if (currentUser) {
 		console.log(currentUser.uid);
 		return (
@@ -61,6 +74,8 @@ function SignIn() {
 			/>
 		);
 	}
+
+	
 	return (
 		<Box display="flex" justifyContent="center" width="5000">
 			<Box borderColor="primary.main" {...defaultProps}>
@@ -104,10 +119,25 @@ function SignIn() {
 						>
 							Forgot Password
 						</button>
+						{/* <button
+						type="submit"
+							className="signup"
+							onClick={newUser}
+						>
+						New Admin? Sign up here
+						</button> */}
+						<NavLink
+								exact
+								to="/signup"
+								activeClassName="active"
+							>
+									New Admin? Sign up here
+							</NavLink>
+							<SocialSignIn />
 					</form>
 
 					<br />
-					<SocialSignIn />
+				
 				</div>
 			</Box>
 		</Box>

@@ -12,7 +12,7 @@
 }
 
 .App-header {
-	padding: 20px;
+	padding: 100px;
   background: url('./topictempest.png') no-repeat;
 }
 
@@ -28,19 +28,14 @@
 }
 nav {
 	font-weight: bold;
-	/* position: absolute; */
 	bottom: 20px;
 }
 
 .navlink {
-	padding: 1.4rem 1.4rem 1.4rem 0.8rem;
+	/* padding: 0.4rem 0.8rem 0.4rem 0.8rem; */
 	border-radius: 3px;
-  color: white;
-	margin-right: 20px;
-  font-weight: bold;
-  padding: 10px;
-}
-
+  color: white;}
+  
 .navlink:hover {
 	background-color: white;
 	color: #28547a;

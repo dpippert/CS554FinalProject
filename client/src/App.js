@@ -35,7 +35,7 @@ function App() {
      <AuthProvider>
         <Router>
         <div>
-          <header className="App-header">
+          <header className="App-header"> </header>
             <Navigation/>
             {/* <div className="topictempest"></div>
             <nav>
@@ -46,7 +46,7 @@ function App() {
                 Our Question and Answer Database 
               </NavLink>
             </nav> */}
-          </header>
+         
           <Container fluid>
             <Route exact path="/test2" component={Test2}/>
             <Route exact path="/play" component={Play}/>
