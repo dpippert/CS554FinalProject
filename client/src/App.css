@@ -1,16 +1,3 @@
-.logo {
-  margin-bottom: 10px;
-  margin-top: 10px;
-}
-
-.top-cols {
-}
-
-/* Have not had success shifting the logo all the way to the right. */
-
-.col-4 {
-}
-
 .App-header {
 	padding: 100px;
   background: url('./topictempest.png') no-repeat;
@@ -21,6 +8,7 @@
   height: 50px;
   width:100%;
 }
+
 .Facebook{
   background: url('./facebook.png') no-repeat;
   height: 100px;
@@ -131,22 +119,6 @@ button {
   width: 50%;
 }
 
-.host-guidance {
-  margin-bottom: 10px;
-}
-
-.your-answer-row {
-}
-
-.your-answer-col {
-  border: 1px solid green;
-}
-
-.square-used {
- /* width: 100%;
-  height: 100%; DPTEST 1 */
-  background-color: red;
-}
 .forgotPassword {
 	background: none !important;
 	border: none !important;

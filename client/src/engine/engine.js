@@ -12,11 +12,13 @@ const config = require('../config');
 let prompt;
 //  const prompt = require('prompt');
 
+let name_ = null;
 let queue_ = [];
 let queue_working_ = false;
 let synth_;
 let zira_;
 let voices_;
+let speechEnabled_ = false;;
 
 const w = console.warn;
 
@@ -70,13 +72,12 @@ function init() {
     processQueue();
 }
 
-const TTS_ENABLED = false;
-const CHAR_DELAY = 20;
+const CHAR_DELAY = 80;
 const NUM_PLAYERS = 2; // 1 is broken DPTEST needs fixed
 const QUESTION_TIME_SEC = 16;
 
 let players_ = {};
-let cb_, gameid_, state_, question_timer_, whosturn_;
+let cb_, gameid_, question_timer_, whosturn_;
 
 function makePlayer() {
   return {bal: 0}
@@ -127,7 +128,7 @@ async function onQuestionTimer() {
     await tell('question_timer', val);
     if (whosturn_ == name_) {
       if (val == 6)
-        msg("5 seconds left");
+        await dmsg(2, "5 seconds left");
       question_timer_ = setTimeout(_ => {
         if (val >= 0) ref.set(val - 1);
       }, 1000);
@@ -147,61 +148,62 @@ async function judgeAnswers() {
   const win = fullquestion.w;
   let doneent = false;
   let doneans = false;
-  await msg("Time's up.");
+  await dmsg(2, "Time's up.");
   switch (entries.length) {
   case 0:
-    await msg("No players have buzzed in.");
-    await msg(`Sorry, correct answer was ${fullquestion.a[0]}`);
+    await dmsg(2, "No players have buzzed in.");
+    await dmsg(2, `Sorry, correct answer was ${fullquestion.a[0]}.`);
     break;
   case 1:
-    await msg(`Only player to buzz in, is ${entries[0].name}`);
+    await dmsg(2, `Only player to buzz in, is ${entries[0].name}.`);
     break;
   default:
-    await msg(`${entries.length} players have buzzed in.`);
+    await dmsg(2, `${entries.length} players have buzzed in.`);
     if (firstJudge_) {
-      await msg(`Player answers will now be checked in order.`);
-      await msg(`First player with correct answer wins this round.`);
+      await dmsg(2, `Player answers will now be checked in order.`);
+      await dmsg(2, `First player with correct answer wins this round.`);
       firstJudge_ = false;
     }
     break;
   }
   for (var i = 0; i < entries.length && !doneent; ++i) {
     const answer = entries[i];
-    await msg(`Player ${answer.name} has buzzed in with ${answer.answer}.`);
+    await dmsg(2, `Player ${answer.name} has buzzed in with ${answer.answer}.`);
     for (var j = 0; j < fullquestion.a.length && !doneans; ++j) {
       let ans = fullquestion.a[j];
       if (ans.toLowerCase() === answer.answer.toLowerCase()) {
-        await msg("That is correct!");
-        await msg(`Player ${answer.name} wins ${win}.`);
+        await dmsg(2, "That is correct!");
+        await dmsg(2, `Player ${answer.name} wins ${win}.`);
         players_[answer.name].balance += win;
         const playersref = gameref('players');
         await playersref.set(players_);
-        await msg(`Adjusting player ${answer.name} balance by +${win}.`);
-        advance(answer.name);
+        advanceAsWinner(answer.name);
         doneans = true;
         doneent = true;
         break;
       }
     }
     if (!doneans) {
-      await msg("Sorry that is incorrect!");
-      await msg(`Player ${answer.name} loses ${win}.`);
+      await dmsg(2, "Sorry that is incorrect!");
+      await dmsg(2, `Player ${answer.name} loses ${win}.`);
       players_[answer.name].balance -= win;
+      w(`answer.name is ${answer.name}`);
+      w("players_ follows");
+      w(JSON.stringify(players_));
       const playersref = gameref('players');
       await playersref.set(players_);
-      await msg(`Adjusting player ${answer.name} balance by -${win}.`);
+      await dmsg(2, `Adjusting player ${answer.name} balance by -${win}.`);
     }
   }
   if (!doneent) {
-    await msg('No one got the correct answer!');
+    await dmsg(2, 'No one got the correct answer!');
     const joined = fullquestion.a.join(', or ');
     if (fullquestion.a.length > 1)
-      await msg(`The correct answer was any of ${joined}.`);
+      await dmsg(2, `The correct answer was any of ${joined}.`);
     else
-      await msg(`The correct answer was ${joined}.`);
+      await dmsg(2, `The correct answer was ${joined}.`);
     const nm = leadPlayer();
-    await msg(`${nm}, you're in the lead with ${players_[nm].balance} dollars.`);
-    advance(nm);
+    advanceAsLeader(nm);
   }
 }
 
@@ -238,11 +240,13 @@ async function onWhosTurn() {
     await tell('whosturn', whosturn_)
     if (name_ != whosturn_)
       return;
+/* redundant I believe
     if (cb_) {
-      await dmsg(2, `Go ahead, your turn ${name_}`);
+      await dmsg(2, `Go ahead, your turn ${name_}.`);
     }
     else
       doRoundConsole();
+*/
   });
 }
 
@@ -256,7 +260,7 @@ async function doRoundConsole() {
     await dmsg(2, `Go ahead, your turn ${name_}`);
     const [topic, amt] = await askTopicAndAmt("Pick topic and amt separated by one space (eg Birds 400)");
     const q = await question(topic, amt);
-    await msg(`${name_} chooses ${topic} for ${amt}`);
+    await dmsg(2, `${name_} chooses ${topic} for ${amt}`);
 //    await startQuestionTimer();
   }
   catch (e) {
@@ -319,6 +323,7 @@ async function buzzin(answer) {
     for (let x of aL)
       if (x.name == name_)
         return;
+    w(`aaa ${answer} for name ${name_}`)
     aL.push({answer, name: name_});
     return aL;
   });
@@ -356,8 +361,6 @@ async function loadQuestions() {
 }
 
 async function setQuestions(questions) {
-  w("setting questions");
-  w(JSON.stringify(questions));
   const ref = gameref('questions');
   await ref.set(questions);
 }
@@ -408,8 +411,6 @@ function onQuestions() {
   ref.on('value', data => {
     if (data.val()) {
       questions_ = data.val();
-      w("the onQuestions questions_ are");
-      w(JSON.stringify(questions_));
     }
   });
 }
@@ -433,8 +434,9 @@ function processQueue() {
     if (queue_.length) {
       queue_working_ = true;
       const str = queue_.shift();
-      if (str != null && str.length)
+      if (str && str.length) {
         await tts(str);
+      }
       await writeline(str).then(f);
       return;
     }
@@ -494,15 +496,32 @@ async function display(str) {
   queue_.push(str);
 }
 
+function sleep(msec) {
+  return new Promise((resolve) => {
+    console.log(`msec is ${msec}`);
+    setTimeout(_ => resolve(), msec);
+  });
+}
+
+// ----------------------------------------------------------------------------
+// Makes some adjustments to the string prior to speaking for some words that
+// are known to cause trouble.
+// ----------------------------------------------------------------------------
+
+function adjust(str) {
+  let s = str.replace(/Nodejs/ig, "Node JS");
+  return s;
+}
+
 function tts(str) {
-  function f(resolve) {
-    if (!TTS_ENABLED) {
+  async function f(resolve) {
+    if (!speechEnabled_) {
       if (resolve)
         resolve();
       else
         return null;
     }
-    if (!TTS_ENABLED)
+    if (!speechEnabled_)
       return null;
     if (!synth_)
       throw 'speech synthesis is not initialized';
@@ -511,21 +530,20 @@ function tts(str) {
       if (!zira_)
         throw 'Could not load voice for speaker';
     }
-    if (synth_.speaking) {
-      w("speaking, will wait until finished");
-      setTimeout(f, 1000);
+    while (synth_.speaking) {
+      await sleep(300);
     }
-    else {
-      let utterance = new SpeechSynthesisUtterance(str);
-      utterance.pitch = 1;
-          utterance.rate = 0.8;
-      utterance.voice = zira_;
-      synth_.speak(utterance);
-      if (resolve)
-        resolve();
-    }
+    let utterance = new SpeechSynthesisUtterance(adjust(str));
+    utterance.pitch = 1;
+    utterance.rate = 0.8;
+    utterance.voice = zira_;
+    synth_.speak(utterance);
+    if (resolve)
+      resolve();
   }
-  return new Promise((resolve) => { f(resolve); });
+  return new Promise(async (resolve) => {
+    try { await f(resolve); }
+    catch (e) { console.error(e); }});
 }
       
 /*
@@ -552,7 +570,9 @@ async function tts(str) {
 */
 
 // ----------------------------------------------------------------------------
-// Installs the listener for msg updates.
+// Installs the listener for msg updates. If the msg incoming starts with
+// a colon, it is not a message but instead is an action that needs to
+// occur.
 // ----------------------------------------------------------------------------
 
 function onMsg(cb) {
@@ -575,23 +595,19 @@ function nullfunc() {
   return new Function();
 }
 
-function timeoutAsync(sec) {
-  return new Promise(resolve => setTimeout(resolve, sec * 1000));
-}
-
-async function wait(n, f, ...args) {
-  await timeoutAsync(n);
-  return f(...args);
+function timeoutAsync(msec) {
+  return new Promise(resolve => setTimeout(resolve, msec));
 }
 
 async function dmsg(n, str) {
-  await timeoutAsync(n);
+  const t = CHAR_DELAY * str.length;
+  await timeoutAsync(t);
   await msg(str);
 }
 
 // ----------------------------------------------------------------------------
-// For side effects only. The natural state of msg should be "", so after
-// every write, that's what is written.
+// msg is for side effects only. The natural state of msg should be "", so
+// after every write, that's what is written.
 // ----------------------------------------------------------------------------
 
 async function msg(str) {
@@ -650,7 +666,7 @@ async function test() {
 let questions_ = {
   "HTML": [{q: "Main content goes here.",
             a: ["body", "<body>"],
-            open: false,
+            open: true,
             w: 200},
 
            {q: "Main content goes here.",
@@ -675,7 +691,7 @@ let questions_ = {
 
   "Nodejs": [{q: "Class selectors start with this character",
               a: [".", "period", "dot"],
-              open: false,
+              open: true,
               w: 200},
 
              {q: "Class selectors start with this character",
@@ -725,7 +741,7 @@ let questions_ = {
 
   "MongoDB": [{q: "Class selectors start with this character",
                a: [".", "period", "dot"],
-               open: true,
+               open: false,
                w: 200},
 
               {q: "Class selectors start with this character",
@@ -853,17 +869,15 @@ async function question(topic, amt) {
     await questionref.child('open').set(false);
   }
 
-  w("before fullquestion");
   const x = fullquestion(topic, amt);
   if (!x)
     throw `invalid topic ${topic} or amt ${amt}`;
   if (!x.open)
     throw `question already played, no longer available ${topic} ${amt}`;
-  w("after fullquestion");
   if (gameid_ && whosturn_ == name_)
     await setActiveSquare(topic, amt, x.q);
-  await msg("And the question is");
-  await msg(x.q);
+  await dmsg(2, "And the question is");
+  await dmsg(2, x.q);
   return x.q;
 }
 
@@ -877,13 +891,13 @@ async function revealTopics() {
   await dmsg(1, "Time to reveal today's topics.");
   const topics = Object.keys(questions_);
 //  await tell('topic_reveal_starts', topics.length); not needed?
-  await msg(`We have ${topics.length} topics for our game.`);
+  await dmsg(2, `We have ${topics.length} topics for our game.`);
   for (let i = 0; i < topics.length; ++i) {
     await setReveal(i, topics[i]);
     await dmsg(1, `Topic is ${topics[i]}.`);
   }
 //  await tell('topic_reveal_ends', topics.length); not needed?
-  await dmsg(1, 'All topics are now revealed!');
+  await dmsg(1, "All topics are now revealed, so let's get started.");
 }
 
 async function onGameOver() {
@@ -895,10 +909,22 @@ async function onGameOver() {
   });
 }
 
-async function advance(name) {
+async function advanceAsLeader(name) {
   const qs = await checkGameOver();
-  if (qs)
+  if (!qs) {
+    await dmsg(2, `${name}, you're in the lead with ${players_[name].balance} dollars.`);
+    await dmsg(2, 'Go ahead and make another selection.');
     await setWhosTurn(name);
+  }
+}
+
+async function advanceAsWinner(name) {
+  const qs = await checkGameOver();
+  if (!qs) {
+    await dmsg(2, `${name}, you won that round so you have honors.`);
+    await dmsg(2, 'Please make your selection.');
+    await setWhosTurn(name);
+  }
 }
 
 // ----------------------------------------------------------------------------
@@ -927,31 +953,35 @@ async function checkGameOver() {
   if (!gameOver)
     return false;
 
+  const initBalance = players_[name_].balance;
   const winningBalance = Object.entries(players_).reduce((rsf, ni) => {
     return ni[1].balance > rsf ? ni[1].balance : rsf;
-  }, 0);
-  dmsg(2, "The game has finished.");
-  dmsg(2, `Winning balance is ${winningBalance}.`);
+  }, initBalance);
+  await dmsg(2, "The game has finished.");
+  await dmsg(2, `Winning balance is ${winningBalance}.`);
   const winners = Object.entries(players_).filter(p => {
     return p[1].balance === winningBalance;
   });
-  let winnerNames;
+  let winnerNames = '';;
   if (winners.length > 1) {
-    for (var x = 0; x < winners.length; ++w) {
+    for (var x = 0; x < winners.length; ++x) {
       if (x > 0)
         winnerNames += ", ";
       if (x + 1 === winners.length)
         winnerNames += "and ";
       winnerNames += winners[x][0];
     }
-    dmsg(2, `The winners are ${winnerNames}.`);
+    const noun = winningBalance >= 0 ? "winners" : "big losers";
+    await dmsg(2, `The ${noun} are ${winnerNames}.`);
   }
   else {
     winnerNames = winners[0][0];
-    dmsg(2, `The winner is ${winnerNames}.`);
+    const subject = winningBalance >= 0 ? "winner" : "loser";
+    await dmsg(2, `The ${subject} is ${winnerNames}.`);
   }
-  dmsg(1, "Thank you for playing Topic Tempest!");
-  setGameOver(true);
+  await dmsg(1, "Thank you for playing Topic Tempest!");
+  await setGameOver(true);
+  return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -965,8 +995,6 @@ async function setWhosTurn(name) {
   let ref = await gameref('whosturn');
   await ref.set(name);
 }
-
-let name_ = null;
 
 async function exists(path) {
   const ref = await db().ref().child(path);
@@ -1013,8 +1041,10 @@ async function readyToPlay(optName) {
 
       gameid_ = enrolling.filter(x => x.startsWith('gameid-'))[0];
       gameid_ = gameid_.replace('gameid-', '');
-      if (enrolling.some(enrollingNm => enrollingNm == name_))
+      if (enrolling.some(enrollingNm => enrollingNm == name_)) {
+        w('name in use already');
         return;
+      }
       installGameListeners();
       if (enrolling.length <= NUM_PLAYERS - 1) {
         enrolling.push(name_);
@@ -1031,25 +1061,25 @@ async function readyToPlay(optName) {
   });
   if (!result.committed) {
     await display(`Name ${name_} already in use, please try another name`);
-    return await readyToPlay(optName);
+    throw Error('Name already taken');
   }
   if (!enrollees) {
-    await msg("Welcome " + name_ + "!");
+    await dmsg(2, "Welcome " + name_ + "!");
     switch (enrolled_count) {
       case NUM_PLAYERS:
-        await msg("You are the first contestant for a new enrolling game.");
-        await msg(`Waiting for ${NUM_PLAYERS - enrolled_count + 1} more to join..`);
+        await display("You are the first contestant for a new enrolling game.");
+        await display(`Waiting for ${NUM_PLAYERS - enrolled_count + 1} more to join..`);
         break;
       case NUM_PLAYERS + 1:
-        await msg("You are the second contestant for a new enrolling game.");
-        await msg(`Waiting for ${NUM_PLAYERS - enrolled_count + 1} more to join..`);
+        await dmsg(2, "You are the second contestant for a new enrolling game.");
+        await dmsg(2, `Waiting for ${NUM_PLAYERS - enrolled_count + 1} more to join..`);
         break;
       default:
         throw `enroll: mixup! ${NUM_PLAYERS} ${enrolled_count} ${name_}`;
     }
     return;
   }
-  await msg("Welcome " + name_ + "!");
+  await dmsg(2, "Welcome " + name_ + "!");
   const x = enrollees.reduce((rsf, ni) => {
     if (ni.startsWith('gameid'))
       return rsf;
@@ -1059,9 +1089,10 @@ async function readyToPlay(optName) {
   await db().ref('/games').child(gameid_).onDisconnect().set(null);
   await gameref('players').set(x);
   await setQuestions(await loadQuestions());
-  await msg("We now have a quorum of players!");
+  await dmsg(2, "We now have a quorum of players!");
   await dmsg(2, "Game will start momentarily..");
   await revealTopics();
+  await dmsg(2, `How about it ${name_}, make the game's first choice.`);
   await setWhosTurn(name_);
 }
 
@@ -1103,7 +1134,11 @@ async function signOut() {
   }
   gameref().set(null);
   await app().auth().signOut();
-  await msg(`${name_} has signed out, sorry but this game is over!`);
+  await dmsg(2, `${name_} has signed out, sorry but this game is over!`);
+}
+
+function setSpeechEnabled(bool) {
+  speechEnabled_ = bool;
 }
 
 module.exports = {
@@ -1111,6 +1146,7 @@ module.exports = {
   onMsg,
   question,
   readyToPlay,
+  setSpeechEnabled,
   signOut,
   start,
   test

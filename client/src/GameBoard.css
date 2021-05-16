@@ -1,0 +1,129 @@
+.top-cols {
+}
+
+.square-active {
+  color: white;
+  font-size: 0.8em;
+  background-color: navy;
+}
+
+.square-used {
+  background-color: red;
+}
+
+.dollar-btn {
+  background-color: rgb(0,123,255);
+}
+
+.square-open {
+  background-color: navy;
+}
+
+.topic {
+  background-color: gold; 
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-align: center;
+  font-variant: small-caps;
+  color: #AA0000;
+}
+
+.only-row-below-board {
+}
+
+.host-guidance {
+  margin-bottom: 10px;
+}
+
+.your-answer-row {
+}
+
+.your-answer-col {
+}
+
+.test-1 {
+  margin-bottom: 10px;
+}
+
+.whosturn {
+  font-weight: bold;
+}
+
+.speaker {
+  font-weight: bold;
+  margin-right: 20px;
+}
+
+.timeleft {
+  font-weight: bold;
+}
+
+nav {
+	font-weight: bold;
+}
+
+.navlink {
+  color: white;
+	margin-right: 20px;
+  font-weight: bold;
+  padding: 10px;
+}
+
+.navlink:hover {
+	background-color: white;
+	color: #28547a;
+	text-decoration: none !important;
+}
+
+.navlink2:hover {
+	background-color: gold;
+	color: #28547a;
+	text-decoration: none !important;
+}
+
+textarea {
+  background-color: white;
+  color: green;
+  font-size: .8em;
+  font-family: 'Calibri';
+  font-weight: bold;
+  align-content: flex-end;
+  width:100%;
+  height:100%; 
+  box-sizing: border-box; 
+}
+
+#buzzin, #answer, #readyToPlayId {
+  font-weight: bold;
+  width: 100%;
+  height: 100%;
+}
+
+button {
+  font-weight: bold;
+  color: gold;
+  margin-top: 0px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+  height: 100%;
+}
+
+/* Is card-body actually used by <Card ..> ? */
+
+.card-body {
+  color: gold;
+  font-weight: bold;
+  width: 100%;
+  height: 100%;
+}
+
+.table {
+  background-color: white;
+}
+
+.table thead {
+  color: white;
+  background-color: navy;
+}
