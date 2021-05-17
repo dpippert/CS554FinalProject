@@ -1,5 +1,7 @@
 /* eslint-disable */
 
+const queries = require('../queries');
+
 //const firebase = require('firebase/app');
 //require('firebase/database');
 
@@ -19,6 +21,7 @@ let synth_;
 let zira_;
 let voices_;
 let speechEnabled_ = false;;
+let client_;
 
 const w = console.warn;
 
@@ -54,8 +57,10 @@ function init() {
     console.error(`Too many inits of ${initCount_}`);
   else {
     processQueue();
+    /* DPTEST is this causing the "name taken" erroneous error?
     if (isBrowser())
       window.addEventListener('unload', signOut);
+      */
   }
 }
 
@@ -260,12 +265,14 @@ async function doRoundConsole() {
 // Expects a callback function where all events will be reported.
 // If no callback function is passed in, engine uses an internal default
 // callback function and assumes it is running standalone on a terminal with
-// no browser driving it.
+// no browser driving it. Second arg is an ApolloClient so that the engine
+// can make queries to an ApolloServer to get questions.
 // ----------------------------------------------------------------------------
 
-async function start(cb) {
+async function start(cb, client) {
   if (!synth_)
     synth_ = window.speechSynthesis;
+  client_ = client;
   try {
     cb_ = cb;
     await init();
@@ -344,7 +351,30 @@ async function onTurnTime(cb) {
 // ----------------------------------------------------------------------------
 
 async function loadQuestions() {
-  return questions_;
+  try {
+    let qs = await client_.query({query: queries.GET_RANDOM_QUESTIONS,
+                                  variables: {nTopics: 5,
+                                              nQuestions: 5},
+                                  fetchPolicy: "no-cache"});
+    const groups = qs.data.randomQuestions;
+    const result = {};
+    for (var g of groups) {
+      const added = g.questions.slice(0, 5).map((x, idx) => {
+        return {...x, win: 200 + idx * 200,
+                      open: true,
+                      q: x.question,
+                      w: 200 + idx * 200,
+                      a: x.answers};
+      });
+      const topic = g.topic.replace(/\]|\[|\*|\}|\{|%|\^|&|@|!|#|\$|\)|\(|\.|\+|=| /g, '');
+      result[topic] = added;
+    }
+    w(result);
+    return result;
+  }
+  catch (e) {
+    throw Error("Server error. " + e.message);
+  }
 }
 
 async function setQuestions(questions) {
@@ -1048,7 +1078,7 @@ async function readyToPlay(optName) {
   });
   if (!result.committed) {
     await display(`Name ${name_} already in use, please try another name`);
-    throw Error('Name already taken');
+    throw Error('Sorry -- name appears to be taken, please try again with a different name.');
   }
   if (!enrollees) {
     await dmsg(2, "Welcome " + name_ + "!");
@@ -1120,7 +1150,9 @@ async function isEnrolling() {
 // ----------------------------------------------------------------------------
 
 async function signOut() {
+  w("signOut");
   if (isEnrolling()) {
+    w("signOut 2");
     let ref = db().ref('/enrolling');
     ref.set(null);
     gameref().set(null);

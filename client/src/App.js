@@ -45,7 +45,7 @@ function App() {
             </nav> */}
           </header>
           <Container fluid>
-            <Route exact path="/play" component={Play}/>
+            <Route exact path="/play" render={() => { return <Play client={client}/>}}/>
             <PrivateRoute exact path="/admin" component={Admin}/>
             <Route exact path="/signin" component={SignIn}/>
             <Route exact path="/signup" component={SignUp}/>

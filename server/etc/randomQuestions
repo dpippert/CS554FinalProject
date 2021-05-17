@@ -1,0 +1,9 @@
+{
+  randomQuestions(nTopics: 5, nQuestions: 5) {
+    topic
+    questions {
+      question
+      answers
+    }
+  }
+}

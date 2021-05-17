@@ -1,5 +1,22 @@
 db.questions.count()
 
+db.questions.countDocuments({})
+
+db.questions.find({}, {projection: {_id: 1, question: 0, topic: 0, answers: 0}})
+
+db.questions.find({}, {projection: {_id: 0, question: 0}})
+
+        .find(
+          {},
+          { projection: { _id: 0, title: 1, 'info.director': 1, cast: 1 } }
+        )
+
+db.questions.find()
+
+db.find.help()
+
+db.questions.find()
+
 show collections
 
 show dbs
