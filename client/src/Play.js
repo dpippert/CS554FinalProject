@@ -15,6 +15,8 @@ import engine from './engine/engine';
 const w = console.warn;
 
 function Play(props) {
+  w("props");
+  w(props);
   const [username, setUsername] = useState('');
   const [mainstate, setMainstate] = useState('waiting-for-enroll-request');
   const [topicamt, setTopicamt] = useState('');
@@ -78,15 +80,14 @@ function Play(props) {
     async function startEngine() {
       try {
 			  console.error("aaa startEngine calling");
-        await engine.start(engineer);
-        //setEng(await engine.start(engineer));
+        await engine.start(engineer, props.client);
       } catch (e) {
         console.error(e);
         alert(e);
       }
     }
     startEngine();
-  }, [topics, usedSquares]);
+  }, [topics, usedSquares, props.client]);
 
   // --------------------------------------------------------------------------
   // Added hack of changing active_square to active_square_2 as it was the only
@@ -115,6 +116,8 @@ function Play(props) {
 				  break;
         case 'active_square':
           setMainstate('active_square_2');
+          document.getElementById("answer").focus();
+          w("aaa mainstate is active_square");
           break;
         case 'buzzin-clicked':
           setMainstate('buzzed-in');
@@ -136,7 +139,7 @@ function Play(props) {
           setMainstate('playing');
           try { await engine.readyToPlay(username); }
           catch (e) {
-            alert("Sorry -- name taken, please try again with a different name.");
+            alert(e.message);
             setMainstate('waiting-for-enroll-request');
           }
           break;
@@ -175,10 +178,7 @@ function Play(props) {
 
   function getBuzzinEnabled() {
     const elem = document.getElementById("answer");
-    if (elem)
-      w(elem.value.length);
     const y = elem && !elem.value.length;
-    w(y);
     return mainstate === 'active_square' || mainstate === 'active_square_2';
   }
 
