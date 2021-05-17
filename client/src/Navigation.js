@@ -38,8 +38,9 @@ const NavigationAuth = () => {
 						position="relative"
 						style={{ background: '#ffffff' }}
 					>
+                        	<Toolbar style={{ color: 'black' }}>
 						
-							<div className="links title">
+							<div>
 							
 								<NavLink
 									exact
@@ -49,7 +50,8 @@ const NavigationAuth = () => {
 							Home   |
 
 								</NavLink>
-                                
+                                </div>
+                            <div>
 								<NavLink
 									exact
 									to="/admin"
@@ -58,7 +60,8 @@ const NavigationAuth = () => {
 							Question-Answers Repo   |
 
 								</NavLink>
-							
+                                </div>
+                            <div>
 							<NavLink
 								exact
 								to="/play"
@@ -69,7 +72,7 @@ const NavigationAuth = () => {
 						</div>
 						
 							
-					
+                        </Toolbar>
 					</AppBar>
 				</nav>
 				

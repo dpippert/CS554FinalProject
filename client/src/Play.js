@@ -321,7 +321,7 @@ function Play(props) {
 
   return (
     <>
-    <Row className="top-row">
+    {/* <Row className="top-row">
       <Col className="top-cols" xs={4}>
         <br/>
         <NavLink className="navlink" to="/admin">Our Question and Answer Repository</NavLink>
@@ -335,7 +335,7 @@ function Play(props) {
           <img className="logo" src='./topictempest_small.png' alt="Topic Tempest logo"/>
         </NavLink>
       </Col>
-    </Row>
+    </Row> */}
     <Row xs={2} md={5}>
       {renderTopicCols()}
     </Row>

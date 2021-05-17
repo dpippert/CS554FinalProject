@@ -1,6 +1,8 @@
 .App-header {
 	padding: 100px;
-  background: url('./topictempest.png') no-repeat;
+margin-left: 30%;
+
+  background: url('./the-tempest.png') no-repeat;
 }
 
 .Google{
@@ -17,22 +19,23 @@
 nav {
 	font-weight: bold;
 	bottom: 20px;
+ background: rgb(8 12 16 / 18%);
 }
 
 .navlink {
 	/* padding: 0.4rem 0.8rem 0.4rem 0.8rem; */
 	border-radius: 3px;
-  color: white;}
+  color: rgb(10, 9, 9);}
   
 .navlink:hover {
-	background-color: white;
-	color: #28547a;
+	background-color: rgb(3, 2, 2);
+	color: #050507;
 	text-decoration: none !important;
 }
 
 .navlink2:hover {
 	background-color: gold;
-	color: #28547a;
+	color: #02040725;
 	text-decoration: none !important;
 }
 
@@ -55,7 +58,7 @@ textarea {
 
 button {
   font-weight: bold;
-  color: gold;
+  color: rgb(14, 9, 63);
   margin-top: 0px;
   margin-right: 10px;
   margin-bottom: 10px;
@@ -64,7 +67,7 @@ button {
 }
 
 .card-body {
-  color: gold;
+  color: rgba(39, 25, 160, 0.541);
   font-weight: bold;
   width: 100%;
   height: 100%;
@@ -89,7 +92,7 @@ button {
 }
 
 .topic {
-  background-color: gold; 
+  background-color: rgb(20, 36, 184); 
   margin-bottom: 10px;
   font-weight: bold;
   font-size: 1.2rem;
