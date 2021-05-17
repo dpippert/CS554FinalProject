@@ -1,5 +1,7 @@
 /* eslint-disable */
 
+const queries = require('../queries');
+
 //const firebase = require('firebase/app');
 //require('firebase/database');
 
@@ -19,6 +21,7 @@ let synth_;
 let zira_;
 let voices_;
 let speechEnabled_ = false;;
+let client_;
 
 const w = console.warn;
 
@@ -50,30 +53,19 @@ function db() {
 let initCount_ = 0;
 
 function init() {
-  // REVISIT this will cause compile error under nodejs, will need to
-  // move to a separate file and try requiring it, or eval a string.
-  // won't work in the face of body element changes, maybe body is stable though
-
-  /*
-  if (isBrowser()) {
-    const x = document.getElementsByTagName('body')[0];
-    w("adding event listener for sign out");
-    x.addEventListener('onunload', _ => {
-      alert("will sign out");
-      w("will sign out");
-      signOut();
-    });
-  }
-  */
-
   if (++initCount_ >= 2)
     console.error(`Too many inits of ${initCount_}`);
-  else
+  else {
     processQueue();
+    /* DPTEST is this causing the "name taken" erroneous error?
+    if (isBrowser())
+      window.addEventListener('unload', signOut);
+      */
+  }
 }
 
 const CHAR_DELAY = 80;
-const NUM_PLAYERS = 2; // 1 is broken DPTEST needs fixed
+const NUM_PLAYERS = 2;
 const QUESTION_TIME_SEC = 16;
 
 let players_ = {};
@@ -273,12 +265,14 @@ async function doRoundConsole() {
 // Expects a callback function where all events will be reported.
 // If no callback function is passed in, engine uses an internal default
 // callback function and assumes it is running standalone on a terminal with
-// no browser driving it.
+// no browser driving it. Second arg is an ApolloClient so that the engine
+// can make queries to an ApolloServer to get questions.
 // ----------------------------------------------------------------------------
 
-async function start(cb) {
+async function start(cb, client) {
   if (!synth_)
     synth_ = window.speechSynthesis;
+  client_ = client;
   try {
     cb_ = cb;
     await init();
@@ -357,7 +351,30 @@ async function onTurnTime(cb) {
 // ----------------------------------------------------------------------------
 
 async function loadQuestions() {
-  return questions_;
+  try {
+    let qs = await client_.query({query: queries.GET_RANDOM_QUESTIONS,
+                                  variables: {nTopics: 5,
+                                              nQuestions: 5},
+                                  fetchPolicy: "no-cache"});
+    const groups = qs.data.randomQuestions;
+    const result = {};
+    for (var g of groups) {
+      const added = g.questions.slice(0, 5).map((x, idx) => {
+        return {...x, win: 200 + idx * 200,
+                      open: true,
+                      q: x.question,
+                      w: 200 + idx * 200,
+                      a: x.answers};
+      });
+      const topic = g.topic.replace(/\]|\[|\*|\}|\{|%|\^|&|@|!|#|\$|\)|\(|\.|\+|=| /g, '');
+      result[topic] = added;
+    }
+    w(result);
+    return result;
+  }
+  catch (e) {
+    throw Error("Server error. " + e.message);
+  }
 }
 
 async function setQuestions(questions) {
@@ -1061,7 +1078,7 @@ async function readyToPlay(optName) {
   });
   if (!result.committed) {
     await display(`Name ${name_} already in use, please try another name`);
-    throw Error('Name already taken');
+    throw Error('Sorry -- name appears to be taken, please try again with a different name.');
   }
   if (!enrollees) {
     await dmsg(2, "Welcome " + name_ + "!");
@@ -1123,18 +1140,25 @@ async function isEnrolling() {
 
 // ----------------------------------------------------------------------------
 // Erases the game from firebase. If the game is in the enrolling state, then
-// the /enrolling is also deleted.
+// the /enrolling is also deleted. CAVEAT I have found there is a race
+// condition of some sort going on due to the window trying to close down.
+// Have found it's best NOT to await the Promise calls in this function
+// but let them proceed in their own time. It is important to put the
+// critical removal of /enrolling first as that seems to always work, whereas
+// the next call to set the game to null, less critical and won't cause
+// issues on restart, sometimes does not occur.
 // ----------------------------------------------------------------------------
 
 async function signOut() {
-  alert("signOut");
+  w("signOut");
   if (isEnrolling()) {
+    w("signOut 2");
     let ref = db().ref('/enrolling');
     ref.set(null);
+    gameref().set(null);
   }
-  gameref().set(null);
-  await app().auth().signOut();
-  await dmsg(2, `${name_} has signed out, sorry but this game is over!`);
+  app().auth().signOut();
+  dmsg(2, `${name_} has signed out, sorry but this game is over!`);
 }
 
 function setSpeechEnabled(bool) {
