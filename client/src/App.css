@@ -34,7 +34,7 @@ nav {
 }
 
 .navlink2:hover {
-	background-color: gold;
+	background-color: rgb(50, 19, 163);
 	color: #02040725;
 	text-decoration: none !important;
 }

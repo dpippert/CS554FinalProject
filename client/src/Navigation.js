@@ -36,7 +36,7 @@ const NavigationAuth = () => {
 					
 					<AppBar
 						position="relative"
-						style={{ background: '#ffffff' }}
+					
 					>
                         	<Toolbar style={{ color: 'black' }}>
 						

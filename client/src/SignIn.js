@@ -54,7 +54,7 @@ function SignIn() {
 	};
 	const newUser = (event) => {
 		event.preventDefault();
-		console.log("hiiiiiiiiii")
+
 	return (
 			<Redirect
 				to={{

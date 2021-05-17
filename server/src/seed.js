@@ -9,7 +9,7 @@ db.questions.drop()
 // A topic/question pair must be unique.
 // ----------------------------------------------------------------------------
 
-db.questions.createIndex{t: 1, q: 1}, {unique: true});
+db.questions.createIndex({t: 1, q: 1}, {unique: true});
 
 // ----------------------------------------------------------------------------
 // This needs to get populated with lots of unique topics and questions..
@@ -18,52 +18,52 @@ db.questions.createIndex{t: 1, q: 1}, {unique: true});
 db.questions.insertMany(
   [
     {"t": "HTML",
-     "q": "1 Main content goes inside this required element.",
+     "q": "Main content goes inside this required element.",
      "a": ["body", "<body>"]},
 
     {"t": "HTML",
-     "q": "2 Main content goes inside this required element.",
-     "a": ["body", "<body>"]},
+     "q": "Title goes inside this required element.",
+     "a": ["title", "<title>"]},
 
     {"t": "HTML",
-     "q": "3 Main content goes inside this required element.",
-     "a": ["body", "<body>"]},
+     "q": "Is the highest heading tag",
+     "a": ["h1", "<h1>","1"]},
 
     {"t": "HTML",
-     "q": "4 Main content goes inside this required element.",
-     "a": ["body", "<body>"]},
+     "q": "HTML stands for?",
+     "a": ["Hyper text markup language"]},
 
     {"t": "HTML",
-     "q": "5 Main content goes inside this required element.",
-     "a": ["body", "<body>"]},
+     "q": "The tag that contains all the tags",
+     "a": ["html", "<html>"]},
 
     {"t": "HTML",
-     "q": "6 Main content goes inside this required element.",
-     "a": ["body", "<body>"]},
+     "q": "Latest version of HTML",
+     "a": ["5", "html5","five"]},
 
     {"t": "CSS",
-     "q": "1 A selector always starts with this character.",
+     "q": " A selector always starts with this character.",
      "a": [".", "period"]},
 
     {"t": "CSS",
-     "q": "2 A selector always starts with this character.",
+     "q": "what does CSS stand for",
+     "a": ["Cascading style sheets", "Cascading stylesheets"]},
+
+    {"t": "CSS",
+     "q": "Where in an HTML document is the correct place to refer to an external style sheet?",
      "a": [".", "period"]},
 
     {"t": "CSS",
-     "q": "3 A selector always starts with this character.",
-     "a": [".", "period"]},
+     "q": "Which HTML tag is used to define an internal style sheet?",
+     "a": ["<Head>", "head"]},
 
     {"t": "CSS",
-     "q": "4 A selector always starts with this character.",
-     "a": [".", "period"]},
+     "q": "Which HTML attribute is used to define inline styles?",
+     "a": ["style"]},
 
     {"t": "CSS",
-     "q": "5 A selector always starts with this character.",
-     "a": [".", "period"]},
-
-    {"t": "CSS",
-     "q": "6 A selector always starts with this character.",
-     "a": [".", "period"]},
+     "q": "Which property is used to change the background color?",
+     "a": ["background-color"]},
 
     {"t": "New Jersey",
      "q": "Current governor of New Jersey last name is",
@@ -126,7 +126,7 @@ db.questions.insertMany(
      "a": ["^", "caret"]},
 
     {"t": "React",
-     "q": "Creator of this framework, last name
+     "q": "Creator of this framework, last name",
      "a": ["Walke"]},
 
     {"t": "React",
@@ -150,28 +150,28 @@ db.questions.insertMany(
      "a": ["unmount", "unmounting"]},
 
     {"t": "SASS",
-     "q": "1 The standard and original file extension for SASS files is this.",
+     "q": " The standard and original file extension for SASS files is this.",
      "a": ["scss"]},
 
     {"t": "SASS",
-     "q": "2 The standard and original file extension for SASS files is this.",
-     "a": ["scss"]},
+     "q": "A group of CSS declarations that can be reused in SASS is called",
+     "a": ["mixin","mixins"]},
 
     {"t": "SASS",
-     "q": "3 The standard and original file extension for SASS files is this.",
-     "a": ["scss"]},
+     "q": "SASS stands for",
+     "a": ["Syntactically awesome Stylesheets","Syntactically awesome Style sheets"]},
 
     {"t": "SASS",
-     "q": "4 The standard and original file extension for SASS files is this.",
-     "a": ["scss"]},
+     "q": "Is SASS fully CSS3 compatile?",
+     "a": ["true","yes"]},
 
     {"t": "SASS",
-     "q": "5 The standard and original file extension for SASS files is this.",
-     "a": ["scss"]},
+     "q": "What is more powerful  SASS or CSS",
+     "a": ["sass"]},
 
     {"t": "SASS",
-     "q": "6 The standard and original file extension for SASS files is this.",
-     "a": ["scss"]},
+     "q": "Document type of SASS is?",
+     "a": ["structured"]},
 
     {"t": "Redis",
      "q": "1 Sorted set commands begin with this letter",
@@ -196,4 +196,29 @@ db.questions.insertMany(
     {"t": "Redis",
      "q": "6 Sorted set commands begin with this letter",
      "a": ["z"]},
+
+     {"t": "HTML",
+     "q": "1 Main content goes inside this required element.",
+     "a": ["body", "<body>"]},
+
+    {"t": "HTML",
+     "q": "2 Main content goes inside this required element.",
+     "a": ["body", "<body>"]},
+
+    {"t": "HTML",
+     "q": "3 Main content goes inside this required element.",
+     "a": ["body", "<body>"]},
+
+    {"t": "HTML",
+     "q": "4 Main content goes inside this required element.",
+     "a": ["body", "<body>"]},
+
+    {"t": "HTML",
+     "q": "5 Main content goes inside this required element.",
+     "a": ["body", "<body>"]},
+
+    {"t": "HTML",
+     "q": "6 Main content goes inside this required element.",
+     "a": ["body", "<body>"]},
+
   ]);
