@@ -19,6 +19,7 @@ import ChangePassword from './ChangePassword';
 import {AuthProvider} from './firebase/Auth'
 import PrivateRoute from './PrivateRoute'
 import Navigation from './Navigation';
+import AddQuestion from './AddQuestion';
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
@@ -54,8 +55,9 @@ function App() {
             <Route exact path="/signin" component={SignIn}/>
             <Route exact path="/signup" component={SignUp}/>
             <Route exact path="/changepassword" component={ChangePassword}/>
+            <Route exact path="/add-question" component={AddQuestion}/>
             {/* <Route exact path="/forgortpassword" component={ForgotPassword}/> */}
-  </Container>
+          </Container>
         </div>
       </Router>
       </AuthProvider>

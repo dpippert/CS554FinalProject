@@ -1,47 +1,97 @@
-const { ApolloServer, gql, ApolloError, UserInputError } = require('apollo-server');
+const { ApolloServer, gql } = require('apollo-server');
+const { UniqueDirectiveNamesRule } = require('graphql');
+//const { UniqueDirectiveNamesRule } = require('graphql');
 const {appConfig, db} = require('./config');
+const uuid = require('uuid');
 
 const typeDefs = gql`
-  type Question {
-    t: String!
-    q: String!
-    a: [String]!
-  }
+    type Query {
+        randomQuestions(nTopics: Int!, nQuestions: Int!): [QuestionGroup]
+        getQuestions(page: Int): [Question]
+        getQuestionsByTopic(topic: String!): [Question]
+    }
 
-  type Query {
-    getQuestion(topic: String) : Question
-  }
+    type QuestionGroup {
+        topic: String
+        questions: [Question]
+    }
 
-  type Mutation {
-    addQuestion(t: String!, q: String!, a: [String]!) : Question
-  }
+    type Question {
+        _id: String
+        t: String
+        q: String
+        a: [String]
+    }
+
+    type Mutation {
+        addQuestion(topic: String!, question: String!, answers: [String]!): Question
+    }
 `;
 
-function randBetween(lo, hi) {
-  const x = (Math.random() * 1000).toFixed(0);
-  return x % (hi - lo) + lo;
-}
+// mongo structure the same, just set restraints when grabbing data (unique q's per topic)
 
 const resolvers = {
-  Query: {
-    getQuestion: async (_, {t}) => {
-      const Q = await db.questions();
-      const qs = await Q.find({t}).toArray();
-      return qs.length ? qs[randBetween(0, qs.length)] : null;
+    Query: {
+        getQuestions: async (_, args) => {
+            try {
+                // get all questions in order of being added to db
+                // may need pagination
+                let page = 1;
+                if (args.page) page = args.page;
+                const questionCollection = await db.questions();
+                return await questionCollection.find({}).skip((page-1)*20).limit(20).toArray();
+            } catch (e) {
+                console.log(e);
+            }
+        },
+
+        getQuestionsByTopic: async (_, args) => {
+            try {
+                // get all the questions with the same topic
+                // maybe use a dropdown on the frontend or a search for topic
+                // may need pagination
+                console.log(args.topic);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+    },
+    QuestionGroup: {
+
+    },
+    Question: {
+
+    },
+    Mutation: {
+        addQuestion: async (_, args) => {
+            try {
+                // add question to mongo collection
+                // maybe use uuid to generate an id
+                // structure would be:
+                // {
+                //    id: String,
+                //    topic: String,
+                //    question: String,
+                //    answers: [ String ]
+                // }
+                const questionCollection = await db.questions();
+                const newQuestion = {
+                    _id: uuid.v4(),
+                    t: args.topic,
+                    q: args.question,
+                    a: args.answers
+                }
+                const added = await questionCollection.insertOne(newQuestion);
+                if (added.insertedCount === 0) throw 'Question not added to database';
+                return newQuestion;
+            } catch(e){
+                console.log(e);
+            }
+        }
     }
-  },
+}
 
-  Mutation: {
-    addQuestion: async (_, args) => {
-      const Q = await db.questions();
-      const {insertedCount} = await Q.insertOne(args);
-      return {...args};
-    }
-  }
-};
-
-const server = new ApolloServer({typeDefs, resolvers});
-
-server.listen().then(({url}) => {
-  console.log(`🚀  Tempest server ready at ${url} 🚀`);
+const server = new ApolloServer ({typeDefs, resolvers});
+server.listen().then (({url}) => {
+    console.log(`Server running on ${url}`);
 });
