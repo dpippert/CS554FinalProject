@@ -334,8 +334,8 @@ function Play(props) {
                 placeholder="Your answer"
                 autoComplete="off"
                 autoCorrect="off"
-                maxLength="24"
-                title="24 chars or less. No funny business please."
+                maxLength="32"
+                title="32 chars or less. No funny business please."
                 disabled={!getAnswerEnabled()}
                 aria-label="Your answer"
                 aria-describedby="basic-addon2"/>
@@ -373,6 +373,8 @@ function Play(props) {
                 title='Keep it on the up and up please. 16 chars or less. Alphanumerics and _.'
                 maxLength="16"
                 placeholder="Username"
+                autoComplete="off"
+                autoCorrect="off"
                 onChange={onUsernameChange}
                 onKeyPress={onUsernameKeyPress}
                 disabled={!getUsernameEnabled()}

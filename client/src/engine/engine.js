@@ -282,7 +282,7 @@ async function start(cb, client) {
 // ----------------------------------------------------------------------------
 
 async function buzzin(answer) {
-  answer = answer.substring(0, 24);
+  answer = answer.substring(0, 32);
   let ref = gameref('answerlist');
   let result = await ref.transaction((aL) => {
     if (!aL) aL = [];
@@ -521,7 +521,9 @@ function sleep(msec) {
 function adjust(str) {
   let s = str.replace(/Nodejs/ig, "Node JS");
   s = s.replace(/useState/ig, "use State");
-  s = s.replace(/Redis/ig, "Rheddehs");
+  s = s.replace(/JavaScript/ig, "Java Script");
+  s = s.replace(/Redis/ig, "reddiss");
+  s = s.replace(/dataset/ig, "data set");
   return s;
 }
 
