@@ -11,8 +11,8 @@ import { AppBar, Toolbar } from '@material-ui/core';
 
 const Navigation = () => {
 	const { currentUser } = useContext(AuthContext);
-	console.log(currentUser);
-	console.log(firebase.auth().currentUser);
+	//console.log(currentUser);
+	//console.log(firebase.auth().currentUser);
 	return (
 		<div>{currentUser ? <NavigationAuth /> : <NavigationNonAuth />}</div>
 	);

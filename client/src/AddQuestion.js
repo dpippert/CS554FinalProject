@@ -89,67 +89,71 @@ function AddQuestion(props) {
                 <SignOutButton/>
             </div>
             <p>{error}</p>
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label>
-                        Topic:
-                        <input
-                        onChange={e => handleChange(0, e)}
-                        className="form-control"
-                        required
-                        name="topic"
-                        type="text"
-                        placeholder="Topic"
-                        value={topic}
-                        />
-                    </label>
+            <div className="card" style={{width: 33 + 'rem'}}>
+                <div className="card-body">
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label>
+                                Topic:
+                                <input
+                                onChange={e => handleChange(0, e)}
+                                className="form-control"
+                                required
+                                name="topic"
+                                type="text"
+                                placeholder="Topic"
+                                value={topic}
+                                />
+                            </label>
+                        </div>
+                        <div className="form-group">
+                            <label>
+                                Question:
+                                <input
+                                onChange={e => handleChange(0, e)}
+                                className="form-control"
+                                required
+                                name="question"
+                                type="text"
+                                placeholder="Question"
+                                value={question}
+                                />
+                            </label>
+                        </div>
+                        {answers.map((answer, index) => (
+                            <div className="form-group">
+                            <label>
+                                Answer:
+                                <input
+                                onChange={e => handleChange(index, e)}
+                                className="form-control"
+                                id={`answer${index}`}
+                                name="answer"
+                                type="text"
+                                placeholder="Answer"
+                                value={answer}
+                                required
+                                />
+                            </label>
+                            {answers.length > 1 && 
+                                <button 
+                                    className="btn btn-danger" 
+                                    name="removeAnswer" 
+                                    type="button" 
+                                    onClick={() => handleRemoveAnswer(index)}>
+                                        Delete
+                                </button>}
+                            </div>
+                        ))}
+                        <button className="btn btn-success" name="addAnotherAnswer" type="button" onClick={() => handleAddAnswer()}>
+                            Add Answer
+                        </button>
+                        <button className="btn btn-primary" id="submitButton" name="submitButton" type="submit">
+                            Submit
+                        </button>
+                    </form>
                 </div>
-                <div className="form-group">
-                    <label>
-                        Question:
-                        <input
-                        onChange={e => handleChange(0, e)}
-                        className="form-control"
-                        required
-                        name="question"
-                        type="text"
-                        placeholder="Question"
-                        value={question}
-                        />
-                    </label>
-                </div>
-                {answers.map((answer, index) => (
-                    <div className="form-group">
-                    <label>
-                        Answer:
-                        <input
-                        onChange={e => handleChange(index, e)}
-                        className="form-control"
-                        id={`answer${index}`}
-                        name="answer"
-                        type="text"
-                        placeholder="Answer"
-                        value={answer}
-                        required
-                        />
-                    </label>
-                    {answers.length > 1 && 
-                        <button 
-                            className="btn btn-danger" 
-                            name="removeAnswer" 
-                            type="button" 
-                            onClick={() => handleRemoveAnswer(index)}>
-                                Delete
-                        </button>}
-                    </div>
-                ))}
-                <button className="btn btn-success" name="addAnotherAnswer" type="button" onClick={() => handleAddAnswer()}>
-                    Add Answer
-                </button>
-                <button className="btn btn-primary" id="submitButton" name="submitButton" type="submit">
-                    Submit
-                </button>
-            </form>
+            </div>
         </div>
     )
 }
