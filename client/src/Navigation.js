@@ -40,28 +40,28 @@ const NavigationAuth = () => {
 					>
                         	<Toolbar style={{ color: 'black' }}>
 						
-							<div>
+							<div class="nav">
 							
 								<NavLink
 									exact
 									to="/"
 									activeClassName="active"
 								>
-							Home   |
+							Home   
 
 								</NavLink>
                                 </div>
-                            <div>
+                            <div class="nav">
 								<NavLink
 									exact
 									to="/admin"
 									activeClassName="active"
 								>
-							Question-Answers Repo   |
+							Question-Answers Repo   
 
 								</NavLink>
                                 </div>
-                            <div>
+                            <div class="nav">
 							<NavLink
 								exact
 								to="/play"
@@ -88,24 +88,25 @@ const NavigationNonAuth = () => {
 				
 				<AppBar position="relative" style={{ background: '#2E3B55', paddingLeft:"200px" }}>
 					<Toolbar style={{ color: 'black' }}>
-						<div >
+						<div class="nav">
 							<NavLink
 								exact
 								to="/play"
 								activeClassName="active"
 								id="landing"
 							>
-							          Ready To Play    |      
+							          Ready To Play        
 							</NavLink>
 						</div>
 
-						<div>
+						<div class="nav">
 							<NavLink
 								exact
 								to="/signin"
 								activeClassName="active"
+                id="portal"
 							>
-								Questions-answers Repo   
+								Our Question and Answer Portal   
 							</NavLink>
 						</div>
                       

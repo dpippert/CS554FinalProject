@@ -27,24 +27,12 @@ const client = new ApolloClient({
 
 function App() {
   return (
-   
     <ApolloProvider client={client}> 
-     
      <AuthProvider>
         <Router>
         <div>
           <header className="App-header"> </header>
             <Navigation/>
-            {/* <div className="topictempest"></div>
-            <nav>
-              <NavLink className="navlink" to="/play">
-                Ready to Play! 
-              </NavLink>
-              <NavLink className="navlink" to="/admin">
-                Our Question and Answer Database 
-              </NavLink>
-            </nav> */}
-         
           <Container fluid>
             <Route exact path="/play" render={() => { return <Play client={client}/>}}/>
             <PrivateRoute exact path="/admin" component={Admin}/>
@@ -58,7 +46,6 @@ function App() {
       </Router>
       </AuthProvider>
     </ApolloProvider> 
-   
   );
 }
 

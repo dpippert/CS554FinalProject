@@ -57,16 +57,14 @@ function init() {
     console.error(`Too many inits of ${initCount_}`);
   else {
     processQueue();
-    /* DPTEST is this causing the "name taken" erroneous error?
     if (isBrowser())
       window.addEventListener('unload', signOut);
-      */
   }
 }
 
 const CHAR_DELAY = 80;
 const NUM_PLAYERS = 2;
-const QUESTION_TIME_SEC = 16;
+const QUESTION_TIME_SEC = 10;
 
 let players_ = {};
 let cb_, gameid_, question_timer_, whosturn_;
@@ -120,7 +118,7 @@ async function onQuestionTimer() {
     await tell('question_timer', val);
     if (whosturn_ == name_) {
       if (val == 6)
-        await dmsg(2, "5 seconds left");
+        await dmsg(2, "5 seconds");
       question_timer_ = setTimeout(_ => {
         if (val >= 0) ref.set(val - 1);
       }, 1000);
@@ -134,8 +132,10 @@ async function judgeAnswers() {
   let ref = gameref('answerlist');
   const snap = await ref.once('value')
   const entries = snap.val() || [];
-
+  await clearAnswerList();
+  await setWhosTurn('');
   const {t, a, q} = await value('active_square');
+  await gameref('active_square').set(null);
   const fullquestion = questions_[t][a / 200 - 1];
   const win = fullquestion.w;
   let doneent = false;
@@ -179,9 +179,6 @@ async function judgeAnswers() {
       await dmsg(2, "Sorry that is incorrect!");
       await dmsg(2, `Player ${answer.name} loses ${win}.`);
       players_[answer.name].balance -= win;
-      w(`answer.name is ${answer.name}`);
-      w("players_ follows");
-      w(JSON.stringify(players_));
       const playersref = gameref('players');
       await playersref.set(players_);
       await dmsg(2, `Adjusting player ${answer.name} balance by -${win}.`);
@@ -227,38 +224,8 @@ async function onWhosTurn() {
   ref.off();
   ref.on('value', async data => {
     whosturn_ = data.val();
-    if (!whosturn_)
-      return;
     await tell('whosturn', whosturn_)
-    if (name_ != whosturn_)
-      return;
-/* redundant I believe
-    if (cb_) {
-      await dmsg(2, `Go ahead, your turn ${name_}.`);
-    }
-    else
-      doRoundConsole();
-*/
   });
-}
-
-// ----------------------------------------------------------------------------
-// DOes not send out the chooses msg until question has returned, meaning it
-// did not throw, meaning topic and amt are valid.
-// ----------------------------------------------------------------------------
-
-async function doRoundConsole() {
-  try {
-    await dmsg(2, `Go ahead, your turn ${name_}`);
-    const [topic, amt] = await askTopicAndAmt("Pick topic and amt separated by one space (eg Birds 400)");
-    const q = await question(topic, amt);
-    await dmsg(2, `${name_} chooses ${topic} for ${amt}`);
-//    await startQuestionTimer();
-  }
-  catch (e) {
-    await display(e);
-    await doRoundConsole();
-  }
 }
 
 // ----------------------------------------------------------------------------
@@ -308,16 +275,20 @@ async function start(cb, client) {
 //  answer: ANSWER}
 //  Checks to see if this player has already answered and if so logs a
 //  warning and ignores the buzzin.
+//
+//  answer must be 24 chars or less, for one so that someone doesn't try to
+//  pull a fast one and insert code, scripts, or other giant pieces of
+//  nothing into the program.
 // ----------------------------------------------------------------------------
 
 async function buzzin(answer) {
+  answer = answer.substring(0, 24);
   let ref = gameref('answerlist');
   let result = await ref.transaction((aL) => {
     if (!aL) aL = [];
     for (let x of aL)
       if (x.name == name_)
         return;
-    w(`aaa ${answer} for name ${name_}`)
     aL.push({answer, name: name_});
     return aL;
   });
@@ -362,9 +333,9 @@ async function loadQuestions() {
       const added = g.questions.slice(0, 5).map((x, idx) => {
         return {...x, win: 200 + idx * 200,
                       open: true,
-                      q: x.question,
+                      q: x.q,
                       w: 200 + idx * 200,
-                      a: x.answers};
+                      a: x.a};
       });
       const topic = g.topic.replace(/\]|\[|\*|\}|\{|%|\^|&|@|!|#|\$|\)|\(|\.|\+|=| /g, '');
       result[topic] = added;
@@ -411,7 +382,6 @@ function onActiveSquare() {
     const value = data.val();
     if (value) {
       await tell('active_square', value);
-      await startQuestionTimer();
     }
   });
 }
@@ -440,10 +410,26 @@ function onReveal() {
   });
 }
 
+async function deliver(s) {
+  const seq = s.split(" ");
+  switch (seq[0]) {
+    case ':whosturn':
+      w(`calling setWhosTurn for ${seq[1]}`);
+      await setWhosTurn(seq[1]);
+      break;
+    default:
+      w(`unknown proxy cannot deliver ${s}`);
+      break;
+  }
+}
+
 // ----------------------------------------------------------------------------
 // Returns a promise that never resolves. This is a poller of an output queue
 // of messages for display and speaking. Stays in here for the life of the
-// application.
+// application. queue_working_ was put in place during early prototyping of
+// this engine with only console and command line so that the engine would
+// not try to prompt the player when the engine was also in the middle of
+// outputting guidance to the player.
 // ----------------------------------------------------------------------------
 
 function processQueue() {
@@ -451,7 +437,11 @@ function processQueue() {
     if (queue_.length) {
       queue_working_ = true;
       const str = queue_.shift();
-      if (str && str.length) {
+      if (str && str.charAt(0) == ':') {
+        await deliver(str).then(f);
+        return;
+      }
+      else if (str && str.length) {
         await tts(str);
       }
       await writeline(str).then(f);
@@ -523,10 +513,15 @@ function sleep(msec) {
 // ----------------------------------------------------------------------------
 // Makes some adjustments to the string prior to speaking for some words that
 // are known to cause trouble.
+// Only hit period with an adjustment if it is not at the end of a line,
+// else it speaks every line ending period. Forget comma and period fixups,
+// it's going to be too ambiguous to deal with.
 // ----------------------------------------------------------------------------
 
 function adjust(str) {
   let s = str.replace(/Nodejs/ig, "Node JS");
+  s = s.replace(/useState/ig, "use State");
+  s = s.replace(/Redis/ig, "Rheddehs");
   return s;
 }
 
@@ -618,8 +613,8 @@ function timeoutAsync(msec) {
 
 async function dmsg(n, str) {
   const t = CHAR_DELAY * str.length;
-  await timeoutAsync(t);
   await msg(str);
+  await timeoutAsync(t);
 }
 
 // ----------------------------------------------------------------------------
@@ -654,8 +649,8 @@ function ask(question) {
 }
 
 async function clearAnswerList() {
-  const ref = gameref('answerList');
-  ref.set(null);
+  const ref = gameref('answerlist');
+  await ref.set(null);
 }
 
 async function askTopicAndAmt() {
@@ -879,7 +874,6 @@ async function question(topic, amt) {
   // --------------------------------------------------------------------------
 
   async function setActiveSquare(topic, amt, question) {
-    w("setActiveSquare");
     const ref = gameref('active_square');
     await ref.set({t: topic, a: amt, q: question});
     const questionref = gameref('questions').child(topic).child(amt / 200 - 1);
@@ -891,10 +885,13 @@ async function question(topic, amt) {
     throw `invalid topic ${topic} or amt ${amt}`;
   if (!x.open)
     throw `question already played, no longer available ${topic} ${amt}`;
-  if (gameid_ && whosturn_ == name_)
-    await setActiveSquare(topic, amt, x.q);
+  if (gameid_ && whosturn_ != name_)
+    throw(`It's not your turn ${name_}`); 
+  await setActiveSquare(topic, amt, x.q);
+  await dmsg(2, `${name_} chooses ${topic} for ${amt}.`);
   await dmsg(2, "And the question is");
   await dmsg(2, x.q);
+  await startQuestionTimer();
   return x.q;
 }
 
@@ -931,7 +928,7 @@ async function advanceAsLeader(name) {
   if (!qs) {
     await dmsg(2, `${name}, you're in the lead with ${players_[name].balance} dollars.`);
     await dmsg(2, 'Go ahead and make another selection.');
-    await setWhosTurn(name);
+    await proxySetWhosTurn(name);
   }
 }
 
@@ -940,7 +937,7 @@ async function advanceAsWinner(name) {
   if (!qs) {
     await dmsg(2, `${name}, you won that round so you have honors.`);
     await dmsg(2, 'Please make your selection.');
-    await setWhosTurn(name);
+    await proxySetWhosTurn(name);
   }
 }
 
@@ -1001,13 +998,16 @@ async function checkGameOver() {
   return true;
 }
 
+async function proxySetWhosTurn(name) {
+  w(`proxySetWhosTurn for ${name}`);
+  await display(`:whosturn ${name}`);
+}
+
 // ----------------------------------------------------------------------------
 // See comments for onWhosTurn for why it is first set to empty string.
 // ----------------------------------------------------------------------------
 
 async function setWhosTurn(name) {
-  await gameref('answerlist').set(null);
-  await gameref('active_square').set(null);
   await gameref('whosturn').set("");
   let ref = await gameref('whosturn');
   await ref.set(name);

@@ -1,4 +1,4 @@
-const { ApolloServer, gql } = require('apollo-server');
+const { ApolloServer, gql, ApolloError, UserInputError } = require('apollo-server');
 const { UniqueDirectiveNamesRule } = require('graphql');
 //const { UniqueDirectiveNamesRule } = require('graphql');
 const {appConfig, db} = require('./config');
@@ -33,6 +33,11 @@ const typeDefs = gql`
     }
 `;
 
+function randBetween(lo, hi) {
+  const x = (Math.random() * 1000).toFixed(0);
+  return x % (hi - lo) + lo;
+}
+
 const resolvers = {
     Query: {
         getQuestions: async (_, args) => {
@@ -60,82 +65,71 @@ const resolvers = {
         },
 
         randomQuestions: async (_, args) => {
-        const Q = await db.questions();
-        const qs = await Q.find().toArray();
-        let results = {};
-        const length = qs.length - 1;
-        w("length is ");
-        w(length);
-        let usedIds = new Set();
-
-        function alreadyUsed(id) {
+          const Q = await db.questions();
+          const qs = await Q.find().toArray();
+          let results = {};
+          const length = qs.length - 1;
+          let usedIds = new Set();
+    
+          function alreadyUsed(id) {
             if (!usedIds.has(id)) {
-            usedIds.add(id);
-            return false;
+              usedIds.add(id);
+              return false;
             }
             return true;
-        }
+          }
             
-        let qualifyingGroups = new Set();
-        let questionGroups = {};
-        let breaker = 0;
-        let done = broke = false;
-        while (!broke && !done) {
+          let qualifyingGroups = new Set();
+          let questionGroups = {};
+          let breaker = 0;
+          let done = broke = false;
+          while (!broke && !done) {
             if (++breaker > 1000) {
-            broke = true;
-            break;
+              broke = true;
+              break;
             }
-            w(`breaker is now ${breaker}`);
             const n = randBetween(0, length);
             let doc = qs[n]; 
             if (alreadyUsed(doc._id))
-            continue;
-            let questionGroup = questionGroups[doc.topic];
+              continue;
+            let questionGroup = questionGroups[doc.t];
             if (!questionGroup)
-            questionGroup = [];
-            w("questionGroup");
-            w(questionGroup);
-            questionGroup.push({question: doc.question,
-                                answers: doc.answers});
-            w(`just added question to topic ${doc.topic}`);
-            questionGroups[doc.topic] = questionGroup;
+              questionGroup = [];
+            questionGroup.push({question: doc.q,
+                                q: doc.q,
+                                answers: doc.answers,
+                                a: doc.a});
+            questionGroups[doc.t] = questionGroup;
             if (breaker < 50)
-            continue;
+              continue;
             for (var t in questionGroups) {
-            w(`checking ${t} in qGs`)
-            if (questionGroups[t].length >= args.nQuestions) {
-                w(`adding ${t} as qualifying group`);
+              if (questionGroups[t].length >= args.nQuestions) {
                 qualifyingGroups.add(t);
                 if (qualifyingGroups.size >= args.nTopics) {
-                w("setting done to true!");
-                done = true;
-                break;
+                  done = true;
+                  break;
                 }
+              }
             }
-            }
-        }
-        if (broke)
-            throw new ApolloError('Unabled to assemble qualifing questions');
-        let finalGroups = {};
-        qualifyingGroups.forEach(g => {
+          }
+          if (broke)
+            throw new ApolloError('Unable to assemble qualifing questions');
+          let finalGroups = {};
+          qualifyingGroups.forEach(g => {
             finalGroups[g] = questionGroups[g];
-        });
-        w("finalGroups");
-        let y = Object.entries(finalGroups).map(x => {
-            return {topic: x[0], questions: x[1]}
-        });
-        w(y);
-        return Object.entries(finalGroups).map(x => {
-            return {topic: x[0], questions: x[1]}
-        });
+          });
+          return Object.entries(finalGroups).map(x => {
+            return {t: x[0], topic: x[0], questions: x[1], q: x[1]}
+          });
         }
     },
+
     QuestionGroup: {
-
     },
+
     Question: {
-
     },
+
     Mutation: {
         addQuestion: async (_, args) => {
             try {
