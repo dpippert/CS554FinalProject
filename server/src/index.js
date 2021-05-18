@@ -15,6 +15,7 @@ const typeDefs = gql`
 
     type Question {
         _id: String
+        uid: String
         t: String
         q: String
         a: [String]
@@ -27,7 +28,7 @@ const typeDefs = gql`
 
   
     type Mutation {
-        addQuestion(topic: String!, question: String!, answers: [String]!): Question
+        addQuestion(uid: String, topic: String!, question: String!, answers: [String]!): Question
         deleteQuestion(_id: String!): Question
     }
 `;
@@ -142,8 +143,13 @@ const resolvers = {
                 //    answers: [ String ]
                 // }
                 const questionCollection = await db.questions();
+                let uid = 'no-uid';
+                if (args.uid) {
+                    uid = args.uid;
+                }
                 const newQuestion = {
                     _id: uuid.v4(),
+                    uid: uid,
                     t: args.topic,
                     q: args.question,
                     a: args.answers

@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import SignOutButton from "./SignOut"
 import './App.css';
 import ChangePassword from "./ChangePassword"
 import { useQuery, useMutation } from '@apollo/client';
 import queries from './queries';
 import { Link } from 'react-router-dom'
+import { AuthContext } from './firebase/Auth';
 
 function Admin(props) {
+  const { currentUser } = useContext(AuthContext);
+  console.log(currentUser);
   //const currentPage = Number(props.match.params.page);
   const currentPage = 1;
   const {loading, error, data} = useQuery(queries.GET_QUESTIONS, {
@@ -67,7 +70,7 @@ function Admin(props) {
                           })}
                         </ul>
                         <button className="btn btn-danger" name="deleteQuestion" type="button" onClick={()=>{handleDelete(question)}}>Delete</button>
-                        <button className="btn btn-link" name="editQuestion" type="button" onClick={()=>{handleEdit(question)}}>Delete</button>
+                        <button className="btn btn-link" name="editQuestion" type="button" onClick={()=>{handleEdit(question)}}>Edit</button>
                       </div>
                     </div>
                   </li>
