@@ -25,6 +25,7 @@ const typeDefs = gql`
 
     type Mutation {
         addQuestion(topic: String!, question: String!, answers: [String]!): Question
+        deleteQuestion(_id: String!): Question
     }
 `;
 
@@ -85,6 +86,20 @@ const resolvers = {
                 if (added.insertedCount === 0) throw 'Question not added to database';
                 return newQuestion;
             } catch(e){
+                console.log(e);
+            }
+        },
+        deleteQuestion: async (_, args) => {
+            try {
+                const questionCollection = await db.questions();
+                const question = await questionCollection.findOne({ _id: args._id });
+                if (!question) throw 'Question does not exist';
+                const deletionInfo = await questionCollection.removeOne({ _id: args._id });
+                if (deletionInfo.deletedCount === 0) {
+                    throw `Could not delete question with id of ${id}`;
+                }
+                return question;
+            } catch (e) {
                 console.log(e);
             }
         }

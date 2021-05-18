@@ -32,9 +32,21 @@ const ADD_QUESTION = gql`
   }
 `;
 
+const DELETE_QUESTION = gql`
+  mutation removeQuestion ($_id: String!) {
+    deleteQuestion(_id: $_id) {
+      _id
+      t
+      q
+      a
+    }
+  }
+`
+
 export default {
   GET_QUESTIONS,
   //GET_QUESTIONS_BY_TOPIC,
-  ADD_QUESTION
+  ADD_QUESTION,
+  DELETE_QUESTION
 }
 

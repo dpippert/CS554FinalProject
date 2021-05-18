@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SignOutButton from "./SignOut"
 import './App.css';
 import ChangePassword from "./ChangePassword"
-import { useQuery } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client';
 import queries from './queries';
 import { Link } from 'react-router-dom'
 
@@ -16,8 +16,19 @@ function Admin(props) {
     fetchPolicy: 'cache-and-network'
   });
 
+  const [removeOneQuestion] = useMutation(queries.DELETE_QUESTION, {
+    refetchQueries: [
+      { query: queries.GET_QUESTIONS }
+    ]
+  });
+
   const handleDelete = (question) => {
     console.log(question);
+    removeOneQuestion({
+      variables: {
+        _id: question._id
+      }
+    });
   };
 
   const handleEdit = (question) => {
