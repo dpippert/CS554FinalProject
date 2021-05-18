@@ -16,6 +16,7 @@ const GET_QUESTIONS = gql`
   query ($page: Int) {
     getQuestions(page: $page) {
       _id
+      uid
       t
       q
       a
@@ -34,9 +35,10 @@ const GET_QUESTIONS_BY_TOPIC = gql`
 `;
 */
 const ADD_QUESTION = gql`
-  mutation addNewQuestion ($topic: String!, $question: String!, $answers: [String]!) {
-    addQuestion(topic: $topic, question: $question, answers: $answers) {
+  mutation addNewQuestion ($uid: String, $topic: String!, $question: String!, $answers: [String]!) {
+    addQuestion(uid:$uid, topic: $topic, question: $question, answers: $answers) {
       _id
+      uid
       t
       q
       a
