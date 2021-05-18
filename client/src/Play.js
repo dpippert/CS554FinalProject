@@ -15,8 +15,6 @@ import engine from './engine/engine';
 const w = console.warn;
 
 function Play(props) {
-  w("props");
-  w(props);
   const [username, setUsername] = useState('');
   const [mainstate, setMainstate] = useState('waiting-for-enroll-request');
   const [topicamt, setTopicamt] = useState('');
@@ -45,6 +43,7 @@ function Play(props) {
     }
 
     async function engineer(evname, evdata) {
+      w(`event: ${evname}`)
       switch (evname) {
         case 'game_over':
           setMainstate('game_over');
@@ -70,6 +69,7 @@ function Play(props) {
           setWhosturn(evdata);
 				  document.getElementById('whosturn').value = evdata;
           setTopicamt(null);
+          setMainstate('playing');
 					break;
 				default:
 					w(`engineer ignoring event ${evname}`);
@@ -79,7 +79,7 @@ function Play(props) {
 
     async function startEngine() {
       try {
-			  console.error("aaa startEngine calling");
+			  console.warn("startEngine calling");
         await engine.start(engineer, props.client);
       } catch (e) {
         console.error(e);
@@ -98,10 +98,15 @@ function Play(props) {
   // On close down of a game the engine seems to want to send in null for the
   // active_square event so those are filtered out below under
   // state 'need_active_square_closed', for now.
+  //
+  // There was a time the active_square state went ahead and set focus on
+  // the Answer box, but this causes a problem in that it scrolls down and
+  // ends up often hiding the viewable question, so it has been removed.
   // --------------------------------------------------------------------------
 
   useEffect(() => {
     async function action() {
+      w(`mainstate: ${mainstate}`);
       switch (mainstate) {
         case 'game_over':
           alert("Game over. Thank you for playing Topic Tempest!");
@@ -116,8 +121,6 @@ function Play(props) {
 				  break;
         case 'active_square':
           setMainstate('active_square_2');
-          document.getElementById("answer").focus();
-          w("aaa mainstate is active_square");
           break;
         case 'buzzin-clicked':
           setMainstate('buzzed-in');
@@ -126,8 +129,8 @@ function Play(props) {
         case 'square-clicked':
           setMainstate('waiting-for-active-square');
           try { await engine.question(topicamt[0], topicamt[1]); }
-          catch { 
-            w('square-clicked rejected as being used');
+          catch (e) { 
+            w(e.message);
             setMainstate('playing');
           }
           break;
@@ -238,9 +241,10 @@ function Play(props) {
   }
 
 	function squareClicked(ev) {
+    w(`squareClicked mainstate = ${mainstate}`);
 	  if (!checkTurn())
 		  return;
-    const btn = ev.target.parentElement.parentElement;
+    const btn = ev.target;
 	  const id = btn.id;
 		const [_, ncol, nrow] = id.split("-");
     setTopicamt(asTopicAmt(nrow, ncol));
@@ -250,12 +254,6 @@ function Play(props) {
   function buzzinClicked(ev) {
     setMainstate('buzzin-clicked');
   }
-
-  /*
-  function onUsernameKeyUp(ev) {
-    return false;
-  }
-  */
 
   function onUsernameKeyPress(ev) {
     const s = ev.target.value + ev.key;
@@ -301,9 +299,7 @@ function Play(props) {
       else
 			  return (
 				  <Row key={k}>
-            <Button id={k} className="dollar-btn" onClick={squareClicked}>
-              <Card body className={squareUsed ? "square-used" : "square-open"}>${200 * (nrow + 1)}</Card>
-            </Button>
+            <Button id={k} className="square-open" onClick={squareClicked}>${200 * (nrow + 1)}</Button>
 				  </Row>
 			  );
 		}
@@ -321,21 +317,6 @@ function Play(props) {
 
   return (
     <>
-    {/* <Row className="top-row">
-      <Col className="top-cols" xs={4}>
-        <br/>
-        <NavLink className="navlink" to="/admin">Our Question and Answer Repository</NavLink>
-      </Col>
-      <Col xs={4}>
-        <br/>
-        <NavLink className="navlink" to="/play">Ready to Play!</NavLink>
-      </Col>
-      <Col xs={4}>
-        <NavLink className="navlink2" to="/test2">
-          <img className="logo" src='./topictempest_small.png' alt="Topic Tempest logo"/>
-        </NavLink>
-      </Col>
-    </Row> */}
     <Row xs={2} md={5}>
       {renderTopicCols()}
     </Row>
@@ -351,7 +332,10 @@ function Play(props) {
             <InputGroup className="test-1">
               <FormControl id="answer"
                 placeholder="Your answer"
+                autoComplete="off"
+                autoCorrect="off"
                 maxLength="24"
+                title="24 chars or less. No funny business please."
                 disabled={!getAnswerEnabled()}
                 aria-label="Your answer"
                 aria-describedby="basic-addon2"/>
@@ -375,8 +359,8 @@ function Play(props) {
         <Row>
           <Col>
             <ToggleButtonGroup type="radio" name="speaker" onChange={speakerClicked}>
-              <ToggleButton className="speaker" variant="success" value={true}>Speaker on</ToggleButton>
-              <ToggleButton  className="speaker" variant="warning" value={false}>Speaker off</ToggleButton>
+              <ToggleButton id="speaker-on" className="speaker" variant="success" value={true}>Speaker on</ToggleButton>
+              <ToggleButton  id="speaker-off" className="speaker" variant="warning" value={false}>Speaker off</ToggleButton>
             </ToggleButtonGroup>
           </Col>
         </Row>
@@ -405,11 +389,12 @@ function Play(props) {
             <InputGroup className="test-1">
               <FormControl id="timeleft"
                 disabled={true}
+                placeholder="Time Left..."
                 aria-label="Time Left"
                 aria-describedby="basic-addon2"/>
             </InputGroup>
           </Col>
-            <Col className="timeleft">Time Left</Col>
+            <Col className="timeleft"></Col>
         </Row>
         <Row>
           <Col>

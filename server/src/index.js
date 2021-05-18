@@ -43,8 +43,6 @@ const resolvers = {
       const qs = await Q.find().toArray();
       let results = {};
       const length = qs.length - 1;
-      w("length is ");
-      w(length);
       let usedIds = new Set();
 
       function alreadyUsed(id) {
@@ -64,7 +62,6 @@ const resolvers = {
           broke = true;
           break;
         }
-        w(`breaker is now ${breaker}`);
         const n = randBetween(0, length);
         let doc = qs[n]; 
         if (alreadyUsed(doc._id))
@@ -72,21 +69,15 @@ const resolvers = {
         let questionGroup = questionGroups[doc.topic];
         if (!questionGroup)
           questionGroup = [];
-        w("questionGroup");
-        w(questionGroup);
         questionGroup.push({question: doc.question,
                             answers: doc.answers});
-        w(`just added question to topic ${doc.topic}`);
         questionGroups[doc.topic] = questionGroup;
         if (breaker < 50)
           continue;
         for (var t in questionGroups) {
-          w(`checking ${t} in qGs`)
           if (questionGroups[t].length >= args.nQuestions) {
-            w(`adding ${t} as qualifying group`);
             qualifyingGroups.add(t);
             if (qualifyingGroups.size >= args.nTopics) {
-              w("setting done to true!");
               done = true;
               break;
             }
@@ -99,11 +90,9 @@ const resolvers = {
       qualifyingGroups.forEach(g => {
         finalGroups[g] = questionGroups[g];
       });
-      w("finalGroups");
       let y = Object.entries(finalGroups).map(x => {
         return {topic: x[0], questions: x[1]}
       });
-      w(y);
       return Object.entries(finalGroups).map(x => {
         return {topic: x[0], questions: x[1]}
       });

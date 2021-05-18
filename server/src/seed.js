@@ -119,7 +119,7 @@ db.questions.insertMany(
 
     {"topic": "Node.js",
      "question": "To create an empty project from scratch, you can use this npm command",
-     "answers": ["init"]},
+     "answers": ["init", "npm init"]},
 
     {"topic": "Node.js",
      "question": "This special character finds use when specifying your package version dependencies",
@@ -139,7 +139,7 @@ db.questions.insertMany(
 
     {"topic": "React",
      "question": "Bootstrapified react components can be had from this library",
-     "answers": ["react-bootstrap", "react bootstrap"]},
+     "answers": ["react-bootstrap", "react bootstrap", "reactbootstrap"]},
 
     {"topic": "React",
      "question": "Installing a component into the current render tree is called this",
@@ -151,27 +151,27 @@ db.questions.insertMany(
 
     {"topic": "SASS",
      "question": "1 The standard and original file extension for SASS files is this.",
-     "answers": ["scss"]},
+     "answers": ["scss", ".scss"]},
 
     {"topic": "SASS",
      "question": "2 The standard and original file extension for SASS files is this.",
-     "answers": ["scss"]},
+     "answers": ["scss", ".scss"]},
 
     {"topic": "SASS",
      "question": "3 The standard and original file extension for SASS files is this.",
-     "answers": ["scss"]},
+     "answers": ["scss", ".scss"]},
 
     {"topic": "SASS",
      "question": "4 The standard and original file extension for SASS files is this.",
-     "answers": ["scss"]},
+     "answers": ["scss", ".scss"]},
 
     {"topic": "SASS",
      "question": "5 The standard and original file extension for SASS files is this.",
-     "answers": ["scss"]},
+     "answers": ["scss", ".scss"]},
 
     {"topic": "SASS",
      "question": "6 The standard and original file extension for SASS files is this.",
-     "answers": ["scss"]},
+     "answers": ["scss", ".scss"]},
 
     {"topic": "Redis",
      "question": "1 Sorted set commands begin with this letter",

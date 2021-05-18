@@ -39,83 +39,6 @@ nav {
 	text-decoration: none !important;
 }
 
-textarea {
-  background-color: white;
-  color: green;
-  font-size: .8em;
-  font-family: 'Calibri';
-  font-weight: bold;
-  align-content: flex-end;
-  width:100%;
-  height:100%; 
-  box-sizing: border-box; 
-}
-
-#buzzin, #answer {
-  width: 100%;
-  height: 100%;
-}
-
-button {
-  font-weight: bold;
-  color: rgb(14, 9, 63);
-  margin-top: 0px;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  width: 100%;
-  height: 100%;
-}
-
-.card-body {
-  color: rgba(39, 25, 160, 0.541);
-  font-weight: bold;
-  width: 100%;
-  height: 100%;
-}
-
-.dollar-btn {
-  background-color: rgb(0,123,255);
-}
-
-.square-open {
-  background-color: navy;
-}
-
-.square-active {
-  color: white;
-  font-size: 0.8em;
-  background-color: navy;
-}
-
-.test-1 {
-  margin-bottom: 10px;
-}
-
-.topic {
-  background-color: rgb(20, 36, 184); 
-  margin-bottom: 10px;
-  font-weight: bold;
-  font-size: 1.2rem;
-  text-align: center;
-  font-variant: small-caps;
-  color: #AA0000;
-}
-
-.only-row-below-board {
-}
-
-.whosturn {
-  font-weight: bold;
-}
-
-.timeleft {
-  font-weight: bold;
-}
-
-.board-col {
-  margin-left: 20px;
-}
-
 .MuiToolbar-regular {
   min-height: 64px;
   margin: auto;
@@ -134,3 +57,9 @@ button {
 	text-decoration: none;
 	color: red;
 }
+
+#landing, #portal {
+  font-weight: bold;
+  color: gold;
+}
+
