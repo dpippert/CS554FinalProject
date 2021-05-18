@@ -1,4 +1,4 @@
-const { ApolloServer, gql } = require('apollo-server');
+const { ApolloServer, gql, ApolloError, UserInputError } = require('apollo-server');
 const { UniqueDirectiveNamesRule } = require('graphql');
 //const { UniqueDirectiveNamesRule } = require('graphql');
 const {appConfig, db} = require('./config');
@@ -31,6 +31,11 @@ const typeDefs = gql`
         deleteQuestion(_id: String!): Question
     }
 `;
+
+function randBetween(lo, hi) {
+  const x = (Math.random() * 1000).toFixed(0);
+  return x % (hi - lo) + lo;
+}
 
 const resolvers = {
     Query: {
@@ -86,12 +91,14 @@ const resolvers = {
             let doc = qs[n]; 
             if (alreadyUsed(doc._id))
               continue;
-            let questionGroup = questionGroups[doc.topic];
+            let questionGroup = questionGroups[doc.t];
             if (!questionGroup)
               questionGroup = [];
-            questionGroup.push({question: doc.question,
-                                answers: doc.answers});
-            questionGroups[doc.topic] = questionGroup;
+            questionGroup.push({question: doc.q,
+                                q: doc.q,
+                                answers: doc.answers,
+                                a: doc.a});
+            questionGroups[doc.t] = questionGroup;
             if (breaker < 50)
               continue;
             for (var t in questionGroups) {
@@ -105,16 +112,13 @@ const resolvers = {
             }
           }
           if (broke)
-            throw new ApolloError('Unabled to assemble qualifing questions');
+            throw new ApolloError('Unable to assemble qualifing questions');
           let finalGroups = {};
           qualifyingGroups.forEach(g => {
             finalGroups[g] = questionGroups[g];
           });
-          let y = Object.entries(finalGroups).map(x => {
-            return {topic: x[0], questions: x[1]}
-          });
           return Object.entries(finalGroups).map(x => {
-            return {topic: x[0], questions: x[1]}
+            return {t: x[0], topic: x[0], questions: x[1], q: x[1]}
           });
         }
     },

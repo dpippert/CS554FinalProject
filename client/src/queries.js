@@ -5,8 +5,8 @@ const GET_RANDOM_QUESTIONS = gql`
     randomQuestions(nTopics: $nTopics, nQuestions: $nQuestions) {
       topic
       questions {
-        question
-        answers
+        q
+        a
       }
     }
   }

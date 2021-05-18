@@ -333,9 +333,9 @@ async function loadQuestions() {
       const added = g.questions.slice(0, 5).map((x, idx) => {
         return {...x, win: 200 + idx * 200,
                       open: true,
-                      q: x.question,
+                      q: x.q,
                       w: 200 + idx * 200,
-                      a: x.answers};
+                      a: x.a};
       });
       const topic = g.topic.replace(/\]|\[|\*|\}|\{|%|\^|&|@|!|#|\$|\)|\(|\.|\+|=| /g, '');
       result[topic] = added;
