@@ -58,6 +58,7 @@ const resolvers = {
             }
         },
 
+<<<<<<< HEAD
         randomQuestions: async (_, args) => {
         const Q = await db.questions();
         const qs = await Q.find().toArray();
@@ -66,6 +67,14 @@ const resolvers = {
         w("length is ");
         w(length);
         let usedIds = new Set();
+=======
+    randomQuestions: async (_, args) => {
+      const Q = await db.questions();
+      const qs = await Q.find().toArray();
+      let results = {};
+      const length = qs.length - 1;
+      let usedIds = new Set();
+>>>>>>> dalemon
 
         function alreadyUsed(id) {
             if (!usedIds.has(id)) {
@@ -74,6 +83,7 @@ const resolvers = {
             }
             return true;
         }
+<<<<<<< HEAD
             
         let qualifyingGroups = new Set();
         let questionGroups = {};
@@ -111,8 +121,29 @@ const resolvers = {
                 break;
                 }
             }
+=======
+        const n = randBetween(0, length);
+        let doc = qs[n]; 
+        if (alreadyUsed(doc._id))
+          continue;
+        let questionGroup = questionGroups[doc.topic];
+        if (!questionGroup)
+          questionGroup = [];
+        questionGroup.push({question: doc.question,
+                            answers: doc.answers});
+        questionGroups[doc.topic] = questionGroup;
+        if (breaker < 50)
+          continue;
+        for (var t in questionGroups) {
+          if (questionGroups[t].length >= args.nQuestions) {
+            qualifyingGroups.add(t);
+            if (qualifyingGroups.size >= args.nTopics) {
+              done = true;
+              break;
+>>>>>>> dalemon
             }
         }
+<<<<<<< HEAD
         if (broke)
             throw new ApolloError('Unabled to assemble qualifing questions');
         let finalGroups = {};
@@ -130,6 +161,23 @@ const resolvers = {
         }
     },
     QuestionGroup: {
+=======
+      }
+      if (broke)
+        throw new ApolloError('Unabled to assemble qualifing questions');
+      let finalGroups = {};
+      qualifyingGroups.forEach(g => {
+        finalGroups[g] = questionGroups[g];
+      });
+      let y = Object.entries(finalGroups).map(x => {
+        return {topic: x[0], questions: x[1]}
+      });
+      return Object.entries(finalGroups).map(x => {
+        return {topic: x[0], questions: x[1]}
+      });
+    }
+  },
+>>>>>>> dalemon
 
     },
     Question: {

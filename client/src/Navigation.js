@@ -104,8 +104,9 @@ const NavigationNonAuth = () => {
 								exact
 								to="/signin"
 								activeClassName="active"
+                id="portal"
 							>
-								Questions-answers Repo   
+								Our Question and Answer Portal   
 							</NavLink>
 						</div>
                       
