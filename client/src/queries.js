@@ -23,7 +23,7 @@ const GET_QUESTIONS_BY_TOPIC = gql`
 */
 const ADD_QUESTION = gql`
   mutation addNewQuestion ($topic: String!, $question: String!, $answers: [String]!) {
-    addQuestion(topic: $topic, question: $question, answers: $ansewrs) {
+    addQuestion(topic: $topic, question: $question, answers: $answers) {
       _id
       t
       q

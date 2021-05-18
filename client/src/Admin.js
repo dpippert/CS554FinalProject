@@ -16,6 +16,14 @@ function Admin(props) {
     fetchPolicy: 'cache-and-network'
   });
 
+  const handleDelete = (question) => {
+    console.log(question);
+  };
+
+  const handleEdit = (question) => {
+    console.log(question)
+  };
+
   if (data) {
     console.log(data);
     const {getQuestions} = data;
@@ -36,8 +44,8 @@ function Admin(props) {
                     <div className="card text-center" key={question._id} style={{width: 33 + 'rem'}}>
                       <div className="card-body">
                         <p>Topic: {question.t}</p>
-                        <p>{question.q}</p>
-                        <p>Aceptable Answers:</p>
+                        <p>Question: {question.q}</p>
+                        <p>Answers:</p>
                         <ul>
                           {question.a.map((answer) => {
                             return (
@@ -47,8 +55,8 @@ function Admin(props) {
                             )
                           })}
                         </ul>
-                        {/*<button className="btn btn-primary" type="button" onClick={()=>{handleToggleBin(post)}}>{post.binned ? "Remove From Bin" : "Add to Bin"}</button>
-                        <button className="btn btn-link" type="button" onClick={()=>{handleDelete(post)}}>Delete Post</button>*/}
+                        <button className="btn btn-danger" name="deleteQuestion" type="button" onClick={()=>{handleDelete(question)}}>Delete</button>
+                        <button className="btn btn-link" name="editQuestion" type="button" onClick={()=>{handleEdit(question)}}>Delete</button>
                       </div>
                     </div>
                   </li>

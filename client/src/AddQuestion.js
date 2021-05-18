@@ -7,12 +7,14 @@ import queries from './queries';
 import { Link } from 'react-router-dom'
 
 function AddQuestion(props) {
-    const [addQuestion] = useMutation(queries.ADD_QUESTION);
+    const [createQuestion] = useMutation(queries.ADD_QUESTION);
     const [topic, setTopic] = useState('');
     const [question, setQuestion] = useState('');
     const [answers, setAnswers] = useState(['']);
+    const [error, setError] = useState('');
+    const [redirect, setRedirect] = useState(false);
     //const [extraAnswers, setExtraAnswers] = useState(0);
-
+/*
     const createQuestion = async() => {
 
         await addQuestion ({
@@ -23,13 +25,25 @@ function AddQuestion(props) {
             }
         });
     }
-
-    const handleSubmit = (e) => {
+*/
+    const handleSubmit = async(e) => {
         e.preventDefault();
         //createQuestion();
         console.log(topic);
         console.log(question);
         console.log(answers);
+        if (!topic || !question || !answers) {
+            setError('All fields are required')
+        } else {
+            const newQuestion = await createQuestion ({
+                variables: {
+                    topic: topic,
+                    question: question,
+                    answers: answers
+                }
+            });
+            setRedirect(true);
+        }
     };
 
     const handleChange = (index, e) => {
@@ -63,12 +77,18 @@ function AddQuestion(props) {
 
     // allow for multiple answers to be added to the form
     // figure out a way to then get those answers into an array to pass to apollo
+    
+    if (redirect) {
+        window.location.href='/admin';
+    }
+
     return (
         <div>
             <div className="container">
                 <ChangePassword/>
                 <SignOutButton/>
             </div>
+            <p>{error}</p>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label>
