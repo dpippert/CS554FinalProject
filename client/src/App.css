@@ -186,13 +186,20 @@ nav {
 color:rgb(5, 5, 8);
 background-color: rgba(73, 69, 69, 0.993);
 }
+
 .card-text{
+  font-weight: bold;
   color:rgb(243, 243, 247);
 }
+
 .card{
   color:rgba(250, 248, 252, 0);
 margin:10px;
 }
 .btn{
 	display: block;
+}
+
+.centerit {
+  text-align: center
 }
