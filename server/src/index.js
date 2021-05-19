@@ -31,6 +31,7 @@ const typeDefs = gql`
     type Mutation {
         addQuestion(uid: String, topic: String!, question: String!, answers: [String]!): Question
         deleteQuestion(_id: String!): Question
+        editQuestion(_id: String, topic: String, question: String, answers: [String]): Question
     }
 `;
 
@@ -186,6 +187,28 @@ const resolvers = {
             } catch (e) {
                 console.log(e);
             }
+        },
+        editQuestion: async (_, args) => {
+          try {
+            let updatedQuestion = {}
+            if (args.topic) {
+              updatedQuestion.t = args.topic;
+            }
+
+            if (args.question) {
+              updatedQuestion.q = args.question;
+            }
+
+            if (args.answers) {
+              updatedQuestion.a = args.answers;
+            }
+
+            const questionCollection = await db.questions();
+            await questionCollection.updateOne({ _id: args._id }, { $set: updatedQuestion });
+            return await questionCollection.findOne({ _id: args._id });
+          } catch (e) {
+            console.log(e);
+          }
         }
     }
 }

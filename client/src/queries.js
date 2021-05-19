@@ -62,6 +62,19 @@ const DELETE_QUESTION = gql`
   mutation removeQuestion ($_id: String!) {
     deleteQuestion(_id: $_id) {
       _id
+      uid
+      t
+      q
+      a
+    }
+  }
+`
+
+const EDIT_QUESTION = gql`
+  mutation editQuestion ($_id: String!, $topic: String, $question: String, $answers: [String]) {
+    editQuestion(_id: $_id, topic: $topic, question: $question, answers: $answers) {
+      _id
+      uid
       t
       q
       a
@@ -73,6 +86,7 @@ module.exports = {
   GET_RANDOM_QUESTIONS,
   GET_QUESTIONS,
   GET_QUESTIONS_FOR_USER,
+  EDIT_QUESTION,
   //GET_QUESTIONS_BY_TOPIC,
   ADD_QUESTION,
   DELETE_QUESTION

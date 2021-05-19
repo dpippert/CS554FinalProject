@@ -20,10 +20,10 @@ const customStyles = {
 };
 
 function EditQuestion(props) {
-    const [showDelete, setShowDelete] = useState(props.isOpen);
-    const [questionToDelete, setQuestionToDelete] = useState(props.questionToDelete);
+    const [showEdit, setShowEdit] = useState(props.isOpen);
+    const [questionToEdit, setQuestionToEdit] = useState(props.questionToEdit);
     const { currentUser } = useContext(AuthContext);
-    const [removeQuestion] = useMutation(queries.DELETE_QUESTION, {
+    const [removeQuestion] = useMutation(queries.EDIT_QUESTION, {
         refetchQueries: [
             { query: queries.GET_QUESTIONS_FOR_USER, variables: { uid: currentUser.uid} }
         ]
@@ -33,42 +33,32 @@ function EditQuestion(props) {
         e.preventDefault();
         removeQuestion({
         variables: {
-            _id: questionToDelete._id
+            _id: questionToEdit._id
         }
         });
-        setShowDelete(false);
+        setShowEdit(false);
         props.handleClose(false);   
     };
 
     const handleClose = () => {
-        setQuestionToDelete(null);
-        setShowDelete(false);
+        setQuestionToEdit(null);
+        setShowEdit(false);
         props.handleClose(false);
     };
     
     const body = (
-        <form id="delete-question" onSubmit={handleSubmit}>
-            <div className="container text-center">
-                <p id="delete-message">Are you sure you want to delete this question?</p>
-            </div>
-            <div className="container text-center">
-                <button className="btn btn-danger" id="submitButton" name="submitButton" type="submit">
-                    Delete
-                </button>
-                <button className="btn btn-link" onClick={handleClose}>
-                    Cancel
-                </button>
-            </div>
+        <form id="edit-question" onSubmit={handleSubmit}>
+            edit
         </form>
     );
 
     return (
         <div>
             <ReactModal
-                name="deleteModal"
+                name="editModal"
                 style={customStyles}
-                isOpen={showDelete}
-                contentLabel="Delete Modal"
+                isOpen={showEdit}
+                contentLabel="Edit Modal"
             >
                 {body}
             </ReactModal>

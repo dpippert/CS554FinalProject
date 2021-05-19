@@ -8,11 +8,13 @@ import { Link } from 'react-router-dom'
 import { AuthContext } from './firebase/Auth';
 import AddQuestion from './modals/AddQuestion';
 import DeleteQuestion from './modals/DeleteQuestion';
-import EditQuestion from './modals/EditQuestion';
+//import EditQuestion from './modals/EditQuestion';
 
 function Admin(props) {
   const [showAdd, setShowAdd] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  //const [showEdit, setShowEdit] = useState(false);
+  //const [questionToEdit, setQuestionToEdit] = useState(null);
   const [questionToDelete, setQuestionToDelete] = useState(null);
   const { currentUser } = useContext(AuthContext);
   console.log(currentUser.uid);
@@ -24,13 +26,13 @@ function Admin(props) {
     },
     fetchPolicy: 'cache-and-network'
   });
-
+/*
   const [removeOneQuestion] = useMutation(queries.DELETE_QUESTION, {
     refetchQueries: [
       { query: queries.GET_QUESTIONS_FOR_USER, variables: { uid: currentUser.uid} }
     ]
   });
-
+*/
   const handleOpenAdd = () => {
     setShowAdd(true);
   }
@@ -55,10 +57,12 @@ function Admin(props) {
     setQuestionToDelete(question);
   }
 
+  /*
   const handleEdit = (question) => {
-    console.log(question)
+    setShowEdit(true);
+    setQuestionToEdit(question);
   };
-
+*/
   if (data) {
     console.log(data);
     const {getQuestionsForUser} = data;
@@ -101,7 +105,7 @@ function Admin(props) {
                           </dl>
                 
                           <button className="btn btn-danger" name="deleteQuestion" type="button" onClick={()=>{handleDelete(question)}}>Delete</button>
-                          <button className="btn btn-link" name="editQuestion" type="button" onClick={()=>{handleEdit(question)}}>Edit</button>
+                          {/*<button className="btn btn-link" name="editQuestion" type="button" onClick={()=>{handleEdit(question)}}>Edit</button>*/}
                         </div>
                       </div>
                     </div>
@@ -126,6 +130,16 @@ function Admin(props) {
               modal="deleteQuestion"
             />
           )}
+{/*
+          {showEdit && showEdit && (
+            <EditQuestion
+              isOpen={showEdit}
+              handleClose={handleCloseModal}
+              questionToEdit={questionToEdit}
+              modal="editQuestion"
+            />
+          )}
+          */}
       </div>
     )
   }
