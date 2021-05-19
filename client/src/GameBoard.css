@@ -8,7 +8,8 @@
 }
 
 .square-used {
-  background-color: red;
+  color: #ffd700;
+  background-color: #c30000; 
 }
 
 .dollar-btn {
@@ -39,13 +40,19 @@
 }
 
 .your-answer-row {
+  padding-top: 10px;
 }
 
 .your-answer-col {
 }
 
-.test-1 {
+.bottom-space {
   margin-bottom: 10px;
+}
+
+label {
+  color: navy;
+  font-weight: bold;
 }
 
 .whosturn {
@@ -84,6 +91,11 @@ textarea {
   width: 100%;
   height: 100%;
   background-color: black;
+}
+
+#answer {
+  position: relative;
+/*  top: 15px; */
 }
 
 #timeleft {

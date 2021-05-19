@@ -95,6 +95,12 @@ db.questions.insertMany(
      "a": ["background-color"]},
 
     {"_id": new ObjectId().str,
+     "t": "GraphQL",
+     "u": null,
+     "q": "Which property is used to change the background color?",
+     "a": ["background-color"]},
+
+    {"_id": new ObjectId().str,
      "t": "New Jersey",
      "u": null,
      "q": "Current governor of New Jersey last name is",
@@ -110,7 +116,7 @@ db.questions.insertMany(
      "t": "New Jersey",
      "u": null,
      "q": "Major toll highway name is",
-     "a": ["New Jersey Turnpike"]},
+     "a": ["New Jersey Turnpike", "NJ Turnpike"]},
 
     {"_id": new ObjectId().str,
      "t": "New Jersey",
