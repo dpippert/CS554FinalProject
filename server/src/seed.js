@@ -95,7 +95,7 @@ db.questions.insertMany(
      "a": ["background-color"]},
 
     {"_id": new ObjectId().str,
-     "t": "GraphQL",
+     "t": "HTML",
      "u": null,
      "q": "Which property is used to change the background color?",
      "a": ["background-color"]},
@@ -351,12 +351,12 @@ db.questions.insertMany(
      "t": "API",
      "u": null,
      "q": "Which of the following header of HTTP response provides control over caching?",
-     "a": ["Cache control"]},
+     "a": ["Cache control", "cache-control"]},
 
     {"_id": new ObjectId().str,
      "t": "API",
      "u": null,
-     "q": "Which of the following HTTP Status code means CREATED, when a resource is successful created using POST or PUT request?",
+     "q": "What is the numerical HTTP Status code meaning CREATED, when a resource is successful created using POST or PUT request?",
      "a": ["201"]},
 
     {"_id": new ObjectId().str,
@@ -374,7 +374,7 @@ db.questions.insertMany(
      {"_id": new ObjectId().str,
      "t": "Computer Basics",
     "u": null,
-    "q": "Full form of PC?",
+    "q": "PC stands for this",
     "a": ["Personal Computer"]},
 
    {"_id": new ObjectId().str,
