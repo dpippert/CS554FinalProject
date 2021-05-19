@@ -32,17 +32,6 @@ import Navigation from './Navigation';
 let serverUrl = window.location.protocol + "//" +
                   window.location.hostname + ":" + "4000";
 
-
-let serverUrl2 = "http://localhost:4000";
-
-console.warn("serverUrl..");
-console.warn(serverUrl);
-console.warn("serverUrl2..");
-console.warn(serverUrl2);
-
-console.warn(typeof serverUrl);
-console.warn(typeof serverUrl2);
-
 const client = new ApolloClient({
     cache: new InMemoryCache(),
     link: new HttpLink({
