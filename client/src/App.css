@@ -182,10 +182,12 @@ nav {
   .card-body{
 color:rgb(5, 5, 8);
 background-color: rgba(73, 69, 69, 0.993);
+width:30%;
 }
 .card-text{
   color:rgb(243, 243, 247);
 }
 .card{
-  color:rgba(250, 248, 252, 0)
+  color:rgba(250, 248, 252, 0);
+  width:30%;
 }
