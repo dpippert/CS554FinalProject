@@ -63,6 +63,107 @@ nav {
   color: gold;
 }
 
+.navigation {
+	background: #282c34;
+	padding: 10px;
+	text-align: center;
+  }
+  
+  .navigation ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+  }
+  
+  .navigation li {
+	display: inline;
+  }
+  
+  .navigation a:link, 
+  .navigation a:visited {
+	color: white;
+	text-align: center;
+	padding: 14px 16px;
+	text-decoration: none;
+  }
+  
+  .navigation li a:hover {
+	font-weight: bold;
+  }
+  
+  .navigation .active {
+	font-weight: bold;
+	color: #bd2828 !important;
+  }
+
+#add-question-button {
+	text-align: center;
+	color: white;
+	margin-top: 10px;
+}
+
+#add-question {
+	text-align: center;
+	margin-top: 10px;
+	color: black;
+}
+
+#add-question label {
+	margin: 13px;
+}
+
+#add-question button {
+	margin: 15px;
+}
+
+#delete-message {
+	text-align: center;
+	padding: 7px;
+	color: black;
+	font-size: 18px;
+}
+
+.question-list {
+	list-style-type: none;
+	margin: 0 auto;
+	display: table;
+	text-align: center;
+}
+
+#topic-card {
+	color: black;
+}
+
+#question-card {
+	padding: 15px;
+	box-shadow: 0 4px 10px 4px #00000080;
+	width: 50%;
+	margin: 0 auto 20px;
+}
+
+#question-card-body {
+	color: black;
+	font-weight: normal;
+}
+
+.card dt {
+	text-align: center;
+	font-weight: bold;
+	display: inline-block;
+	margin-right: 3px;
+}
+
+.card p {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
+.card dd {
+	display: inline;
+	margin-left: 3px;
+}
+
 .nav{
   padding-left:50px;
 }

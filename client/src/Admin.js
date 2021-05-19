@@ -6,25 +6,42 @@ import { useQuery, useMutation } from '@apollo/client';
 import queries from './queries';
 import { Link } from 'react-router-dom'
 import { AuthContext } from './firebase/Auth';
+import AddQuestion from './modals/AddQuestion';
+import DeleteQuestion from './modals/DeleteQuestion';
+//import EditQuestion from './modals/EditQuestion';
 
 function Admin(props) {
+  const [showAdd, setShowAdd] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  //const [showEdit, setShowEdit] = useState(false);
+  //const [questionToEdit, setQuestionToEdit] = useState(null);
+  const [questionToDelete, setQuestionToDelete] = useState(null);
   const { currentUser } = useContext(AuthContext);
-  console.log(currentUser);
+  console.log(currentUser.uid);
   //const currentPage = Number(props.match.params.page);
   const currentPage = 1;
-  const {loading, error, data} = useQuery(queries.GET_QUESTIONS, {
+  const {loading, error, data} = useQuery(queries.GET_QUESTIONS_FOR_USER, {
     variables: {
-      page: 1
+      uid: currentUser.uid
     },
     fetchPolicy: 'cache-and-network'
   });
-
+/*
   const [removeOneQuestion] = useMutation(queries.DELETE_QUESTION, {
     refetchQueries: [
-      { query: queries.GET_QUESTIONS }
+      { query: queries.GET_QUESTIONS_FOR_USER, variables: { uid: currentUser.uid} }
     ]
   });
+*/
+  const handleOpenAdd = () => {
+    setShowAdd(true);
+  }
 
+  const handleCloseModal = () => {
+    setShowAdd(false);
+    setShowDelete(false);
+  }
+/*
   const handleDelete = (question) => {
     console.log(question);
     removeOneQuestion({
@@ -33,51 +50,96 @@ function Admin(props) {
       }
     });
   };
+*/
 
+  const handleDelete = (question) => {
+    setShowDelete(true);
+    setQuestionToDelete(question);
+  }
+
+  /*
   const handleEdit = (question) => {
-    console.log(question)
+    setShowEdit(true);
+    setQuestionToEdit(question);
   };
-
+*/
   if (data) {
     console.log(data);
-    const {getQuestions} = data;
-    console.log(getQuestions);
+    const {getQuestionsForUser} = data;
+    console.log(getQuestionsForUser);
     return (
       <div>
         <ChangePassword/>
         <SignOutButton/>
 
-        <div className="container">
-          <Link to="/add-question" className="btn btn-primary">Add a Question</Link>
+        <div className="container text-center">
+          <button className="btn btn-primary" id="add-question-button" onClick={handleOpenAdd}>Add a Question</button>
         </div>
-          <ul>
-            <div className="container">
-              {getQuestions.map((question) => {
+          
+              {getQuestionsForUser.map((question) => {
                 return (
-                  <li>
-                    <div className="card text-center" key={question._id} style={{width: 33 + 'rem'}}>
-                      <div className="card-body">
-                        <p>Topic: {question.t}</p>
-                        <p>Question: {question.q}</p>
-                        <p>Answers:</p>
-                        <ul>
-                          {question.a.map((answer) => {
-                            return (
-                              <li>
-                                {answer}
-                              </li>
-                            )
-                          })}
-                        </ul>
-                        <button className="btn btn-danger" name="deleteQuestion" type="button" onClick={()=>{handleDelete(question)}}>Delete</button>
-                        <button className="btn btn-link" name="editQuestion" type="button" onClick={()=>{handleEdit(question)}}>Edit</button>
+                  
+                    <div className="container text-center">
+                      <div className="card text-center" id="question-card" key={question._id}>
+                        <div className="card-body" id="question-card-body">
+                          <dl>
+                            <p>
+                              <dt>Topic:</dt>
+                              <dd>{question.t}</dd>
+                            </p>
+                            
+                            <p>
+                              <dt>Question:</dt>
+                              <dd>{question.q}</dd>
+                            </p>
+                              
+                            <p>                    
+                              <dt>Answer(s):</dt>
+                              
+                                {question.a.map((answer, index) => {
+                                  if (question.a.length > 1 && index < question.a.length-1) return <dd key={answer}>{answer},</dd>;
+                                  return <dd key={answer}>{answer}</dd>;
+                                })}
+                              
+                            </p>
+                          </dl>
+                
+                          <button className="btn btn-danger" name="deleteQuestion" type="button" onClick={()=>{handleDelete(question)}}>Delete</button>
+                          {/*<button className="btn btn-link" name="editQuestion" type="button" onClick={()=>{handleEdit(question)}}>Edit</button>*/}
+                        </div>
                       </div>
                     </div>
-                  </li>
+                  
                 );
               })}
-            </div>
-          </ul>
+          
+
+          {showAdd && showAdd && (
+            <AddQuestion
+              isOpen={showAdd}
+              handleClose={handleCloseModal}
+              modal="addQuestion"
+            />
+          )}
+
+          {showDelete && showDelete && (
+            <DeleteQuestion
+              isOpen={showDelete}
+              handleClose={handleCloseModal}
+              questionToDelete={questionToDelete}
+              modal="deleteQuestion"
+            />
+          )}
+{/*
+          {showEdit && showEdit && (
+            <EditQuestion
+              isOpen={showEdit}
+              handleClose={handleCloseModal}
+              questionToEdit={questionToEdit}
+              modal="editQuestion"
+            />
+          )}
+          */}
       </div>
     )
   }

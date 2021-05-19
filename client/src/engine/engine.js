@@ -348,12 +348,13 @@ async function loadQuestions() {
     throw Error("Server error. " + e.message +
       ". Possible reaons: " +
       "\n\n" +
-      "1. Is the server running? You can start it by going to the ./server " +
-      "directory of the project, then: 'node src/index.js'." +
+      "1. Can I reach the server? The server must be running on the same machine you " +
+      "pointed to when starting this client. For example, if you are here because you pointed " +
+      "your web browser to 'http://10.0.0.85:3000', then I am looking for the server to be " +
+      "running at 'http://10.0.0.85:4000'." +
       "\n\n" +
-      "2. Have you seeded the database? To do that, go to the ./server " +
-      "directory of the project, and provided the mongo shell is " +
-      "in your PATH, run: 'mongo tempest seed.js'.");
+      "2. Have you seeded the database? The server needs to have a seeded database. See the " +
+      "README.md file for how to seed the database.");
   }
 }
 
@@ -548,10 +549,23 @@ function tts(str) {
       return null;
     if (!synth_)
       throw 'speech synthesis is not initialized';
+    synth_.getVoices().filter(x => {
+      console.warn(x.name);
+    });
     if (!zira_) {
       zira_ = synth_.getVoices().filter(x => x.name.includes('Zira'))[0];
-      if (!zira_)
-        throw 'Could not load voice for speaker';
+      if (!zira_) {
+        console.warn('Could not load voice Zira for speaker');
+        zira_ = synth_.getVoices().filter(x => x.name.includes('US English'))[0];
+        if (!zira_) {
+          console.warn('Could not load voice Google US English for speaker');
+          zira_ = synth_.getVoices().filter(x => x.name.includes('UK English'))[0];
+          if (!zira_) {
+            console.warn('Could not load voice UK English for speaker');
+            return;
+          }
+        }
+      }
     }
     while (synth_.speaking) {
       await sleep(300);

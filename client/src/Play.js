@@ -139,13 +139,17 @@ function Play(props) {
           break;
         case 'rtp-clicked':
           setMainstate('playing');
-          try { await engine.readyToPlay(username); }
+          try {
+            await engine.setSpeechEnabled(true);
+            await engine.readyToPlay(username);
+          }
           catch (e) {
             alert(e.message);
             setMainstate('waiting-for-enroll-request');
           }
           break;
         case 'waiting-for-enroll-request':
+          setSpeaker(true);
 				  document.getElementById('username').focus();
           break;
         default:
@@ -239,9 +243,11 @@ function Play(props) {
     return [topic, amt]
   }
 
-  function speakerClicked(bool) {
-    setSpeaker(bool);
-    engine.setSpeechEnabled(bool);
+  function speakerClicked(value) {
+    w(value);
+    const x = value == 1 ? true : false;
+    setSpeaker(x);
+    engine.setSpeechEnabled(x);
   }
 
 	function squareClicked(ev) {
@@ -328,7 +334,7 @@ function Play(props) {
       <Col className="lhs-col-of-only-row-below-board">
         <Row>
           <Col className="host-guidance">
-            <label for="guidance">Guidance</label>
+            <label htmlFor="guidance">Guidance</label>
           </Col>
         </Row>
         <Row>
@@ -375,14 +381,14 @@ function Play(props) {
                 title="Click to turn on the guidance speaker"
                 className="speaker"
                 variant="success"
-                value={true}
+                value={1}
                 aria-describedby="speaker-on">Speaker on
               </ToggleButton>
               <ToggleButton id="speaker-off"
                 className="speaker"
                 title="Click to mute the guidance speaker."
                 variant="warning"
-                value={false}>Speaker off</ToggleButton>
+                value={2}>Speaker off</ToggleButton>
             </ToggleButtonGroup>
           </Col>
         </Row>
