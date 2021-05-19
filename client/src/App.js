@@ -12,6 +12,7 @@ import Admin from './Admin';
 import Container from 'react-bootstrap/Container';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
+import Home from './Home';
 import ChangePassword from './ChangePassword';
 import {AuthProvider} from './firebase/Auth'
 import PrivateRoute from './PrivateRoute'
@@ -34,6 +35,7 @@ function App() {
           <header className="App-header"> </header>
             <Navigation/>
           <Container fluid>
+          <Route exact path="/" component={Home}/>
             <Route exact path="/play" render={() => { return <Play client={client}/>}}/>
             <PrivateRoute exact path="/admin" component={Admin}/>
             <Route exact path="/signin" component={SignIn}/>

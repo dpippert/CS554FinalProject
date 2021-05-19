@@ -109,7 +109,6 @@ function Play(props) {
       w(`mainstate: ${mainstate}`);
       switch (mainstate) {
         case 'game_over':
-          alert("Game over. Thank you for playing Topic Tempest!");
           setUsername('');
           setMainstate('waiting-for-enroll-request');
           break;
@@ -193,10 +192,15 @@ function Play(props) {
     setMainstate('rtp-clicked');
   }
 
+  // --------------------------------------------------------------------------------
+  // There are sometmes spurious null squares that can wind up in usedSquares.
+  // Ignore these.
+  // --------------------------------------------------------------------------------
+
   function isSquareUsed(ncol, nrow) {
     const topic = topics[ncol];
     function f(square) {
-		  return ((square.t === topic) && (square.a === ((nrow + 1) * 200))) ?
+		  return ((square && square.t === topic) && (square.a === ((nrow + 1) * 200))) ?
 			  square : false;
     }
     return usedSquares.some(f);
@@ -334,8 +338,8 @@ function Play(props) {
                 placeholder="Your answer"
                 autoComplete="off"
                 autoCorrect="off"
-                maxLength="24"
-                title="24 chars or less. No funny business please."
+                maxLength="32"
+                title="32 chars or less. No funny business please."
                 disabled={!getAnswerEnabled()}
                 aria-label="Your answer"
                 aria-describedby="basic-addon2"/>
@@ -373,6 +377,8 @@ function Play(props) {
                 title='Keep it on the up and up please. 16 chars or less. Alphanumerics and _.'
                 maxLength="16"
                 placeholder="Username"
+                autoComplete="off"
+                autoCorrect="off"
                 onChange={onUsernameChange}
                 onKeyPress={onUsernameKeyPress}
                 disabled={!getUsernameEnabled()}

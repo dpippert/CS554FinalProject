@@ -285,7 +285,7 @@ db.questions.insertMany(
      "t": "Redis",
      "u": null,
      "q": "Redis typically holds the whole dataset in",
-     "a": ["memory"]},
+     "a": ["memory", "RAM"]},
 
     {"_id": new ObjectId().str,
      "t": "Redis",
@@ -308,14 +308,14 @@ db.questions.insertMany(
     {"_id": new ObjectId().str,
      "t": "JavaScript",
      "u": null,
-     "q": "How many major syntactic categories are there in the JavaScript?",
+     "q": "How many major syntactic categories are there in JavaScript?",
      "a": ["2"]},
 
     {"_id": new ObjectId().str,
      "t": "JavaScript",
      "u": null,
      "q": "Which is the most common host environment for JavaScript?",
-     "a": ["Web Browser"]},
+     "a": ["Web Browser", "browser"]},
 
     {"_id": new ObjectId().str,
      "t": "JavaScript",

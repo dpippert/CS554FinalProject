@@ -1,6 +1,7 @@
 .App-header {
 	padding: 100px;
-	margin-left: 30%;
+margin-left: 25%;
+
   background: url('./the-tempest.png') no-repeat;
 }
 
@@ -94,10 +95,6 @@ nav {
 	font-weight: bold;
 	color: #bd2828 !important;
   }
-  
-.a{
-  color:gold
-}
 
 #add-question-button {
 	text-align: center;
@@ -126,12 +123,6 @@ nav {
 	font-size: 18px;
 }
 
-.card {
-	box-shadow: 0 4px 10px 4px #00000080;
-	width: 50%;
-	margin: 0 auto 20px;
-}
-
 .question-list {
 	list-style-type: none;
 	margin: 0 auto;
@@ -144,8 +135,10 @@ nav {
 }
 
 #question-card {
-	margin-top: 20px;
 	padding: 15px;
+	box-shadow: 0 4px 10px 4px #00000080;
+	width: 50%;
+	margin: 0 auto 20px;
 }
 
 #question-card-body {
@@ -169,4 +162,30 @@ nav {
 .card dd {
 	display: inline;
 	margin-left: 3px;
+}
+
+.nav{
+  padding-left:50px;
+}
+
+#landing:hover, #portal:hover {
+  text-decoration: none;
+}
+
+.a{
+  color:rgb(8, 8, 6)
+}
+.card-title{
+  color:rgb(33, 11, 94);
+  font-weight: 900;
+}
+  .card-body{
+color:rgb(5, 5, 8);
+background-color: rgba(73, 69, 69, 0.993);
+}
+.card-text{
+  color:rgb(243, 243, 247);
+}
+.card{
+  color:rgba(250, 248, 252, 0)
 }
