@@ -84,16 +84,22 @@ function ChangePassword() {
         <br />
       </div>
     );
-  } else {
-    return (
-      <div>
-        <h2>
-          You are signed in using a Social Media Provider, You cannot change
-          your password
-        </h2>
-      </div>
-    );
   }
+
+  return (
+    <div>
+    </div>
+  )
+  // } else {
+  //   return (
+  //     <div>
+  //       <h2>
+  //         You are signed in using a Social Media Provider, You cannot change
+  //         your password
+  //       </h2>
+  //     </div>
+  //   );
+  // }
 }
 
 export default ChangePassword;
