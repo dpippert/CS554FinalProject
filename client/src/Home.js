@@ -15,7 +15,7 @@ function Home(){
         <div className="card-body">
           <h5 className="card-title">Our Demo Game</h5>
           <br/>
-          <p className="card-text">Using our question and answer repository in conjunction with our real-time
+          <p className="card-text">Using our question/answer repository in conjunction with our real-time
           gaming engine, we offer to you a free game we call</p>
           <div>
           <img className="card-text" src="./topictempest_small.png" title="Topic Tempest" alt="Topic Tempest"/>
@@ -24,7 +24,7 @@ function Home(){
           <p className="card-text">Currently configured for two players, Topic Tempest throws up a Jeopardy-like
           format, a setting that should be familiar to most. It showcases our backend questions repository
           and cloud-based real-time database, as key enabling technologies to get you thinking about how you can bring
-          a fun and dynamic learning experience to your students, clients, members, and more.
+          a fun and dynamic learning experience to your students, clients, members, and more!
           </p>
           <a href="/play" className="btn btn-primary">Ready To  Play!</a>
         </div>
@@ -33,18 +33,17 @@ function Home(){
       <br/>
         <div className="card">
        
-        <div class="card-body">
-          <h5 class="card-title">Our Question and Answer Portal</h5>
+        <div className="card-body">
+          <h5 className="card-title">Our Question and Answer Portal</h5>
           <br/>
-          <p class="card-text">To add question and answers to the database one has to sign up.<br/>
-          There are options on how one can Sign In.
-          <br></br>
-          Signing in using your email Id and Password<br/>
-          Signing in using your Facebook social media account<br/>
-          Signing in using your gmail account<br/>
-          One can add question and answers to the database with the topics.<br/>
-          The question can have multiple answers<br/>
+          <p className="card-text">
+          A simple database of questions and answers, organized by topics of your choosing. It's
+          as easy as creating a topic, then building a suite of questions and answers pertaining
+          to that topic.
+          We invite you to try it out, starting with our industry-standard OAuth-driven sign-in process.
           </p>
+          <p className="card-text">For those of you who are computer programs, not to worry! Our database is built with
+          an integrated, cutting-edge GraphQL API for all your application's needs!</p>
           <a href="/admin" className="btn btn-primary">Let's try it out!</a>
         </div>
       </div> 
