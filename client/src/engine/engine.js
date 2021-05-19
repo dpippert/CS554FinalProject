@@ -117,7 +117,7 @@ async function onQuestionTimer() {
     }
     await tell('question_timer', val);
     if (whosturn_ == name_) {
-      if (val == 6)
+      if (val == 5)
         await dmsg(2, "5 seconds");
       question_timer_ = setTimeout(_ => {
         if (val >= 0) ref.set(val - 1);
@@ -327,6 +327,7 @@ async function loadQuestions() {
                                   variables: {nTopics: 5,
                                               nQuestions: 5},
                                   fetchPolicy: "no-cache"});
+    w(qs);
     const groups = qs.data.randomQuestions;
     const result = {};
     for (var g of groups) {
@@ -344,7 +345,15 @@ async function loadQuestions() {
     return result;
   }
   catch (e) {
-    throw Error("Server error. " + e.message);
+    throw Error("Server error. " + e.message +
+      ". Possible reaons: " +
+      "\n\n" +
+      "1. Is the server running? You can start it by going to the ./server " +
+      "directory of the project, then: 'node src/index.js'." +
+      "\n\n" +
+      "2. Have you seeded the database? To do that, go to the ./server " +
+      "directory of the project, and provided the mongo shell is " +
+      "in your PATH, run: 'mongo tempest seed.js'.");
   }
 }
 

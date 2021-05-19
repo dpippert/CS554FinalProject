@@ -62,9 +62,15 @@ nav {
   font-weight: bold;
   color: gold;
 }
+
 .nav{
   padding-left:50px;
 }
+
+#landing:hover, #portal:hover {
+  text-decoration: none;
+}
+
 .a{
   color:gold
 }

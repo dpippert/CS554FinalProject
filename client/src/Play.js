@@ -109,7 +109,6 @@ function Play(props) {
       w(`mainstate: ${mainstate}`);
       switch (mainstate) {
         case 'game_over':
-          alert("Game over. Thank you for playing Topic Tempest!");
           setUsername('');
           setMainstate('waiting-for-enroll-request');
           break;
@@ -193,10 +192,15 @@ function Play(props) {
     setMainstate('rtp-clicked');
   }
 
+  // --------------------------------------------------------------------------------
+  // There are sometmes spurious null squares that can wind up in usedSquares.
+  // Ignore these.
+  // --------------------------------------------------------------------------------
+
   function isSquareUsed(ncol, nrow) {
     const topic = topics[ncol];
     function f(square) {
-		  return ((square.t === topic) && (square.a === ((nrow + 1) * 200))) ?
+		  return ((square && square.t === topic) && (square.a === ((nrow + 1) * 200))) ?
 			  square : false;
     }
     return usedSquares.some(f);
