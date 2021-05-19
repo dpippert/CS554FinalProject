@@ -23,6 +23,18 @@ const GET_QUESTIONS = gql`
     }
   }
 `;
+
+const GET_QUESTIONS_FOR_USER = gql`
+  query ($uid: String!) {
+    getQuestionsForUser(uid: $uid) {
+      _id
+      uid
+      t
+      q
+      a
+    }
+  }
+`;
 /*
 const GET_QUESTIONS_BY_TOPIC = gql`
   query ($page: Int!) {
@@ -60,6 +72,7 @@ const DELETE_QUESTION = gql`
 module.exports = {
   GET_RANDOM_QUESTIONS,
   GET_QUESTIONS,
+  GET_QUESTIONS_FOR_USER,
   //GET_QUESTIONS_BY_TOPIC,
   ADD_QUESTION,
   DELETE_QUESTION

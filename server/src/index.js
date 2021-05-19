@@ -11,6 +11,7 @@ const typeDefs = gql`
         randomQuestions(nTopics: Int!, nQuestions: Int!): [QuestionGroup]
         getQuestions(page: Int): [Question]
         getQuestionsByTopic(topic: String!): [Question]
+        getQuestionsForUser(uid: String!): [Question]
     }
 
     type Question {
@@ -121,6 +122,17 @@ const resolvers = {
           return Object.entries(finalGroups).map(x => {
             return {t: x[0], topic: x[0], questions: x[1], q: x[1]}
           });
+        },
+
+        getQuestionsForUser: async (_, args) => {
+            try {
+                let page = 1;
+                if (args.page) page = args.page;
+                const questionCollection = await db.questions();
+                return await questionCollection.find({uid: args.uid}).skip((page-1)*20).limit(20).toArray();
+            } catch (e) {
+                console.log(e);
+            }
         }
     },
 
