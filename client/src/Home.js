@@ -6,9 +6,7 @@ function Home(){
     return(
         <div>
           <div class="card-group">
-            <br/>
-            <br/>
-        <div class="card">
+         
           <h1></h1> <h2></h2> <h3></h3> <h4></h4>
           <br/>
           <br/>
@@ -61,7 +59,7 @@ function Home(){
       </div> 
       </div>
       </div>
-      </div>
+     
     )
 }
 export default Home;
