@@ -1,6 +1,6 @@
 .App-header {
 	padding: 100px;
-margin-left: 30%;
+margin-left: 25%;
 
   background: url('./the-tempest.png') no-repeat;
 }
@@ -72,5 +72,19 @@ nav {
 }
 
 .a{
-  color:gold
+  color:rgb(8, 8, 6)
+}
+.card-title{
+  color:rgb(33, 11, 94);
+  font-weight: 900;
+}
+  .card-body{
+color:rgb(5, 5, 8);
+background-color: rgba(73, 69, 69, 0.993);
+}
+.card-text{
+  color:rgb(243, 243, 247);
+}
+.card{
+  color:rgba(250, 248, 252, 0)
 }
