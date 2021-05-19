@@ -93,7 +93,7 @@ nav {
   
   .navigation .active {
 	font-weight: bold;
-	color: #bd2828 !important;
+	color: #ff9721 !important;
   }
 
 #add-question-button {
@@ -134,14 +134,17 @@ nav {
 	color: black;
 }
 
-#question-card {
+.question-card {
 	padding: 15px;
 	box-shadow: 0 4px 10px 4px #00000080;
-	width: 50%;
-	margin: 0 auto 20px;
+	width: 60%;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
-#question-card-body {
+.question-card-body {
 	color: black;
 	font-weight: normal;
 }

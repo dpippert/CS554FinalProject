@@ -80,20 +80,20 @@ function Admin(props) {
                 return (
                   
                     <div className="container text-center">
-                      <div className="card text-center" id="question-card" key={question._id}>
-                        <div className="card-body" id="question-card-body">
+                      <div className="card text-center question-card" key={question._id}>
+                        <div className="question-card-body">
                           <dl>
-                            <p>
+                            <div className="container">
                               <dt>Topic:</dt>
                               <dd>{question.t}</dd>
-                            </p>
+                            </div>
                             
-                            <p>
+                            <div className="container">
                               <dt>Question:</dt>
                               <dd>{question.q}</dd>
-                            </p>
+                            </div>
                               
-                            <p>                    
+                            <div className="container">                    
                               <dt>Answer(s):</dt>
                               
                                 {question.a.map((answer, index) => {
@@ -101,7 +101,7 @@ function Admin(props) {
                                   return <dd key={answer}>{answer}</dd>;
                                 })}
                               
-                            </p>
+                            </div>
                           </dl>
                 
                           <button className="btn btn-danger" name="deleteQuestion" type="button" onClick={()=>{handleDelete(question)}}>Delete</button>

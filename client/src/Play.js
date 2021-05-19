@@ -139,13 +139,17 @@ function Play(props) {
           break;
         case 'rtp-clicked':
           setMainstate('playing');
-          try { await engine.readyToPlay(username); }
+          try {
+            await engine.setSpeechEnabled(true);
+            await engine.readyToPlay(username);
+          }
           catch (e) {
             alert(e.message);
             setMainstate('waiting-for-enroll-request');
           }
           break;
         case 'waiting-for-enroll-request':
+          setSpeaker(true);
 				  document.getElementById('username').focus();
           break;
         default:
@@ -239,9 +243,11 @@ function Play(props) {
     return [topic, amt]
   }
 
-  function speakerClicked(bool) {
-    setSpeaker(bool);
-    engine.setSpeechEnabled(bool);
+  function speakerClicked(value) {
+    w(value);
+    const x = value == 1 ? true : false;
+    setSpeaker(x);
+    engine.setSpeechEnabled(x);
   }
 
 	function squareClicked(ev) {
@@ -328,25 +334,32 @@ function Play(props) {
       <Col className="lhs-col-of-only-row-below-board">
         <Row>
           <Col className="host-guidance">
-            <textarea id="guidance" readOnly={true} rows="6"></textarea> 
+            <label htmlFor="guidance">Guidance</label>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <textarea id="guidance" readOnly={true} rows="6"
+              title="Offers guidance by reading aloud current game state"></textarea> 
           </Col>
         </Row>
         <Row className="your-answer-row">
           <Col className="your-answer-col" xs={12} sm={6}>
             <InputGroup className="test-1">
               <FormControl id="answer"
+                type="text"
                 placeholder="Your answer"
                 autoComplete="off"
-                autoCorrect="off"
                 maxLength="32"
-                title="32 chars or less. No funny business please."
+                title="Enter your answer here. 32 chars or less. No funny business please."
                 disabled={!getAnswerEnabled()}
                 aria-label="Your answer"
-                aria-describedby="basic-addon2"/>
+                aria-describedby="answer"/>
             </InputGroup>
            </Col>
            <Col xs={12} sm={6}>
-             <Button id="buzzin" disabled={!getBuzzinEnabled()} onClick={buzzinClicked}>Buzz in</Button>
+             <Button id="buzzin" disabled={!getBuzzinEnabled()} onClick={buzzinClicked}
+               title="Click this button to buzz in your answer">Buzz in</Button>
            </Col>
         </Row>
         <Row>
@@ -354,8 +367,9 @@ function Play(props) {
             <InputGroup className="test-1">
               <FormControl id="whosturn"
                 disabled={true}
+                title="Displays who's turn it is"
                 aria-label="Whos turn"
-                aria-describedby="basic-addon2"/>
+                aria-describedby="whosturn"/>
             </InputGroup>
           </Col>
           <Col className="whosturn">Who's Turn</Col>
@@ -363,8 +377,18 @@ function Play(props) {
         <Row>
           <Col>
             <ToggleButtonGroup type="radio" name="speaker" onChange={speakerClicked}>
-              <ToggleButton id="speaker-on" className="speaker" variant="success" value={true}>Speaker on</ToggleButton>
-              <ToggleButton  id="speaker-off" className="speaker" variant="warning" value={false}>Speaker off</ToggleButton>
+              <ToggleButton id="speaker-on"
+                title="Click to turn on the guidance speaker"
+                className="speaker"
+                variant="success"
+                value={1}
+                aria-describedby="speaker-on">Speaker on
+              </ToggleButton>
+              <ToggleButton id="speaker-off"
+                className="speaker"
+                title="Click to mute the guidance speaker."
+                variant="warning"
+                value={2}>Speaker off</ToggleButton>
             </ToggleButtonGroup>
           </Col>
         </Row>
@@ -372,27 +396,32 @@ function Play(props) {
       <Col className="rhs-col-of-only-row-below-board">
         <Row>
           <Col>
-            <InputGroup className="test-1">
+            <InputGroup className="bottom-space">
               <FormControl id="username"
-                title='Keep it on the up and up please. 16 chars or less. Alphanumerics and _.'
+                title='Enter any unique single game username for yourself here. Keep it on the up and up please. 16 chars or less. Alphanumerics and _.'
                 maxLength="16"
                 placeholder="Username"
+                type="text"
                 autoComplete="off"
-                autoCorrect="off"
                 onChange={onUsernameChange}
                 onKeyPress={onUsernameKeyPress}
                 disabled={!getUsernameEnabled()}
                 aria-label="Username"
-                aria-describedby="basic-addon2"/>
+                aria-describedby="username"/>
             </InputGroup>
           </Col>
           <Col>
-            <Button onClick={rtpClicked} id="readyToPlayId" disabled={!getRtpEnabled()}>Ready to Play</Button>
+            <Button aria-label="Ready to Play button"
+              onClick={rtpClicked} id="readyToPlayId"
+              title="Click to enroll in this game when you are ready"
+              disabled={!getRtpEnabled()}>
+              Ready to Play
+            </Button>
           </Col>
         </Row>
         <Row>
           <Col>
-            <InputGroup className="test-1">
+            <InputGroup className="bottom-space">
               <FormControl id="timeleft"
                 disabled={true}
                 placeholder="Time Left..."

@@ -19,11 +19,35 @@ import PrivateRoute from './PrivateRoute'
 import Navigation from './Navigation';
 //import AddQuestion from './AddQuestion';
 
+// ----------------------------------------------------------------------------
+// ApolloClient needs to be able to find its ApolloServer to talk to. The
+// ApolloServer is assumed below to be running on the same machine as where
+// this browser app was *loaded* from, which may not be localhost. For example
+// if this App was started by going to your browser and typing (eg)
+// http://10.0.0.85:3000, then this ApolloClient init code expects that its
+// ApolloServer it needs to talk to, is running on 10.0.0.85:4000.
+// Uses window.location to find out these required coordinates.
+// ----------------------------------------------------------------------------
+
+let serverUrl = window.location.protocol + "//" +
+                  window.location.hostname + ":" + "4000";
+
+
+let serverUrl2 = "http://localhost:4000";
+
+console.warn("serverUrl..");
+console.warn(serverUrl);
+console.warn("serverUrl2..");
+console.warn(serverUrl2);
+
+console.warn(typeof serverUrl);
+console.warn(typeof serverUrl2);
+
 const client = new ApolloClient({
-  cache: new InMemoryCache(),
-  link: new HttpLink({
-    uri: 'http://localhost:4000'
-  })
+    cache: new InMemoryCache(),
+    link: new HttpLink({
+          uri: serverUrl
+        })
 });
 
 function App() {
