@@ -188,18 +188,25 @@ background-color: rgba(73, 69, 69, 0.993);
 }
 
 .card-text{
-  font-weight: bold;
   color:rgb(243, 243, 247);
 }
 
-.card{
-  color:rgba(250, 248, 252, 0);
-margin:10px;
-}
-.btn{
-	display: block;
+.home-card-text {
+	font-weight: bold;
 }
 
+.card{
+	color:rgba(250, 248, 252, 0);
+  }
+
+.home-card {
+	color:rgba(250, 248, 252, 0);
+	margin:10px;
+}
+
+.btn-home {
+	display: block;
+}
 
 #question-card-body {
 	background-color: white;
