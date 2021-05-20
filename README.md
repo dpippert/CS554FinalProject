@@ -32,7 +32,17 @@ server.
 localhost on default port of 27017. Database is called **tempest**.
 
 1. There is a client and server that need to be BUILT (AND RUN) SEPARATELY. The client lives
-in ```./client``` and the server lives in ```./server```.
+in ```./client``` and the server lives in ```./server```. Setup for each of these is explained
+in their respective sections below.
+
+### Seed the database
+
+1. Once you have mongo running it must be seeded in order to populate the **tempest**
+database. Locate the file ```./server/src/seed.js``` and switch into that directory.
+Assuming you have the mongo shell in your PATH, type ```mongo tempest seed.js```. This
+should take a second or two and complete without errors.
+
+1. Testing with mongo v4.2.7.
 
 ### Client setup
 

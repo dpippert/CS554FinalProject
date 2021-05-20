@@ -169,7 +169,6 @@ async function judgeAnswers() {
         players_[answer.name].balance += win;
         const playersref = gameref('players');
         await playersref.set(players_);
-        console.warn("aaa 1");
         console.warn(players_[answer.name].balance);
         advanceAsWinner(answer.name);
         doneans = true;
@@ -284,6 +283,8 @@ async function start(cb, client) {
 // ----------------------------------------------------------------------------
 
 async function buzzin(answer) {
+ if (typeof answer !== 'string')
+    throw Error('buzzin answer not a string');
   answer = answer.substring(0, 32);
   let ref = gameref('answerlist');
   let result = await ref.transaction((aL) => {
@@ -865,6 +866,8 @@ function fullquestion(topic, amt) {
 // ----------------------------------------------------------------------------
 
 async function question(topic, amt) {
+  if (typeof topic !== 'string')
+    throw `topic is not a string`;
 
   // --------------------------------------------------------------------------
   // Called to set the active square and close off this question from further

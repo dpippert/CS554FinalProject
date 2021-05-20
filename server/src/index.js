@@ -67,7 +67,10 @@ const resolvers = {
         },
 
         randomQuestions: async (_, args) => {
-          w("inside randomQuestions");
+          if (typeof args.nTopics !== 'number')
+            throw UserInputError(`nTopics is not a number`);
+          if (typeof args.nQuestions !== 'number')
+            throw UserInputError(`nQuestions is not a number`);
           const Q = await db.questions();
           const qs = await Q.find().toArray();
           let results = {};
@@ -95,8 +98,6 @@ const resolvers = {
             let doc = qs[n]; 
             if (alreadyUsed(doc._id))
               continue;
-            w("doc");
-            w(doc);
             let questionGroup = questionGroups[doc.t];
             if (!questionGroup)
               questionGroup = [];
@@ -107,7 +108,6 @@ const resolvers = {
             questionGroups[doc.t] = questionGroup;
             if (breaker < 50)
               continue;
-            w(questionGroups);
             for (var t in questionGroups) {
               if (questionGroups[t].length >= args.nQuestions) {
                 qualifyingGroups.add(t);
@@ -124,8 +124,6 @@ const resolvers = {
           qualifyingGroups.forEach(g => {
             finalGroups[g] = questionGroups[g];
           });
-          w("finalGroups");
-          w(finalGroups);
           return Object.entries(finalGroups).map(x => {
             return {t: x[0], topic: x[0], questions: x[1], q: x[1]}
           });
