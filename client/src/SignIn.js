@@ -80,7 +80,7 @@ function SignIn() {
 		<Box display="flex" justifyContent="center" width="5000">
 			<Box borderColor="primary.main" {...defaultProps}>
 				<div>
-					<h1>Login</h1>
+					<h1 className="login-heading">Login</h1>
 					<form
 						onSubmit={handleLogin}
 						className={classes.root}

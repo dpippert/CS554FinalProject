@@ -426,7 +426,7 @@ function Play(props) {
                 disabled={true}
                 placeholder="Time Left..."
                 aria-label="Time Left"
-                aria-describedby="basic-addon2"/>
+                aria-describedby="timeleft"/>
             </InputGroup>
           </Col>
             <Col className="timeleft"></Col>

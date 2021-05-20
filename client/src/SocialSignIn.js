@@ -15,8 +15,8 @@ const SocialSignIn = () => {
   };
   return (
     <div>   
-      <div  onClick={() => socialSignOn('google')} class="Google" />
-      <div  onClick={() => socialSignOn('facebook')} class="Facebook"/>
+      <div  onClick={() => socialSignOn('google')} className="Google" />
+      <div  onClick={() => socialSignOn('facebook')} className="Facebook"/>
       {/* <img
        src='client/public/imgs/btn_google_signin.png'
         onClick={() => socialSignOn('google')}

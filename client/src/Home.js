@@ -5,7 +5,7 @@ const w = console.warn;
 function Home(){
     return(
         <div>
-          <div class="card-group">
+          <div className="card-group">
          
           <h1></h1> <h2></h2> <h3></h3> <h4></h4>
           <br/>

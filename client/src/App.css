@@ -219,3 +219,7 @@ background-color: rgba(73, 69, 69, 0.993);
 .centerit {
   text-align: center
 }
+
+.login-heading {
+  color: navy;
+}
