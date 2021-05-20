@@ -169,6 +169,8 @@ async function judgeAnswers() {
         players_[answer.name].balance += win;
         const playersref = gameref('players');
         await playersref.set(players_);
+        console.warn("aaa 1");
+        console.warn(players_[answer.name].balance);
         advanceAsWinner(answer.name);
         doneans = true;
         doneent = true;
@@ -327,7 +329,6 @@ async function loadQuestions() {
                                   variables: {nTopics: 5,
                                               nQuestions: 5},
                                   fetchPolicy: "no-cache"});
-    w(qs);
     const groups = qs.data.randomQuestions;
     const result = {};
     for (var g of groups) {
@@ -341,19 +342,19 @@ async function loadQuestions() {
       const topic = g.topic.replace(/\]|\[|\*|\}|\{|%|\^|&|@|!|#|\$|\)|\(|\.|\+|=| /g, '');
       result[topic] = added;
     }
-    w(result);
     return result;
   }
   catch (e) {
     throw Error("Server error. " + e.message +
       ". Possible reaons: " +
       "\n\n" +
-      "1. Is the server running? You can start it by going to the ./server " +
-      "directory of the project, then: 'node src/index.js'." +
+      "1. Can I reach the server? The server must be running on the same machine you " +
+      "pointed to when starting this client. For example, if you are here because you pointed " +
+      "your web browser to 'http://10.0.0.85:3000', then I am looking for the server to be " +
+      "running at 'http://10.0.0.85:4000'." +
       "\n\n" +
-      "2. Have you seeded the database? To do that, go to the ./server " +
-      "directory of the project, and provided the mongo shell is " +
-      "in your PATH, run: 'mongo tempest seed.js'.");
+      "2. Have you seeded the database? The server needs to have a seeded database. See the " +
+      "README.md file for how to seed the database.");
   }
 }
 
@@ -423,7 +424,7 @@ async function deliver(s) {
   const seq = s.split(" ");
   switch (seq[0]) {
     case ':whosturn':
-      w(`calling setWhosTurn for ${seq[1]}`);
+      w(`deliver calling setWhosTurn for ${seq[1]}`);
       await setWhosTurn(seq[1]);
       break;
     default:
@@ -546,12 +547,23 @@ function tts(str) {
     }
     if (!speechEnabled_)
       return null;
-    if (!synth_)
-      throw 'speech synthesis is not initialized';
+    if (!synth_) {
+      console.warn('speech synthesis is not initialized');
+      resolve();
+    }
     if (!zira_) {
       zira_ = synth_.getVoices().filter(x => x.name.includes('Zira'))[0];
-      if (!zira_)
-        throw 'Could not load voice for speaker';
+      if (!zira_) {
+        console.warn('Could not load voice Zira for speaker');
+        zira_ = synth_.getVoices().filter(x => x.name.includes('US English'))[0];
+        if (!zira_) {
+          console.warn('Could not load voice Google US English for speaker');
+          zira_ = synth_.getVoices().filter(x => x.name.includes('UK English'))[0];
+          if (!zira_) {
+            console.warn('Could not load voice UK English for speaker');
+          }
+        }
+      }
     }
     while (synth_.speaking) {
       await sleep(300);
@@ -569,29 +581,6 @@ function tts(str) {
     catch (e) { console.error(e); }});
 }
       
-/*
-async function tts(str) {
-  if (!zira_) {
-    zira_ = synth_.getVoices().filter(x => x.name.includes('Zira'))[0];
-    console.debug("zira next..");
-    console.debug(zira_);
-  }
-  if (synth_.speaking) {
-    console.error("synth_ is already speaking");
-    return;
-  }
-  let utterance = new SpeechSynthesisUtterance(str);
-  utterance.pitch = 1;
-  utterance.rate = 0.8;
-  utterance.voice = zira_;
-  console.debug("before speak..");
-  console.debug(new Date());
-  synth_.speak(utterance);
-  console.debug("after speak..");
-  console.debug(new Date());
-}
-*/
-
 // ----------------------------------------------------------------------------
 // Installs the listener for msg updates. If the msg incoming starts with
 // a colon, it is not a message but instead is an action that needs to
@@ -1161,9 +1150,7 @@ async function isEnrolling() {
 // ----------------------------------------------------------------------------
 
 async function signOut() {
-  w("signOut");
   if (isEnrolling()) {
-    w("signOut 2");
     let ref = db().ref('/enrolling');
     ref.set(null);
     gameref().set(null);

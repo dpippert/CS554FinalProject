@@ -179,19 +179,27 @@ nav {
   color:rgb(8, 8, 6)
 }
 .card-title{
-  color:rgb(33, 11, 94);
+  color:rgb(255, 254, 254);
   font-weight: 900;
 }
   .card-body{
 color:rgb(5, 5, 8);
 background-color: rgba(73, 69, 69, 0.993);
 }
+
 .card-text{
+  font-weight: bold;
   color:rgb(243, 243, 247);
 }
+
 .card{
-  color:rgba(250, 248, 252, 0)
+  color:rgba(250, 248, 252, 0);
+margin:10px;
 }
+.btn{
+	display: block;
+}
+
 
 #question-card-body {
 	background-color: white;
@@ -199,4 +207,8 @@ background-color: rgba(73, 69, 69, 0.993);
 
 .form-control {
 	width: 500px;
+}
+
+.centerit {
+  text-align: center
 }
