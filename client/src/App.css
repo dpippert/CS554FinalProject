@@ -200,6 +200,15 @@ margin:10px;
 	display: block;
 }
 
+
+#question-card-body {
+	background-color: white;
+}
+
+.form-control {
+	width: 500px;
+}
+
 .centerit {
   text-align: center
 }
