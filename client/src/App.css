@@ -196,3 +196,7 @@ background-color: rgba(73, 69, 69, 0.993);
 #question-card-body {
 	background-color: white;
 }
+
+.form-control {
+	width: 500px;
+}

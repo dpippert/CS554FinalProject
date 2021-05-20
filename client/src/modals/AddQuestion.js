@@ -136,6 +136,7 @@ function AddQuestion(props) {
                     className="form-control"
                     required
                     name="question"
+                    id="question-box"
                     type="text"
                     placeholder="Question"
                     value={question}
